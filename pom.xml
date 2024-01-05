@@ -13,6 +13,7 @@
         <module>eureka-server</module>
         <module>eureka-client</module>
         <module>api-gateway</module>
+        <module>cloud-config</module>
     </modules>
 
     <properties>
