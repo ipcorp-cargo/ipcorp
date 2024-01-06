@@ -14,6 +14,7 @@
         <module>eureka-client</module>
         <module>api-gateway</module>
         <module>cloud-config</module>
+        <module>order-service</module>
     </modules>
 
     <properties>

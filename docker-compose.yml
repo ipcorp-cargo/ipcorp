@@ -1,0 +1,22 @@
+version: '3.9'
+
+
+
+services:
+
+  db-order:
+    image:  postgres:15-alpine
+    restart: always
+    container_name: db-order
+    environment:
+      - 'POSTGRES_USER=ipcorp'
+      - 'POSTGRES_DB=ipcorp-order'
+      - 'POSTGRES_PASSWORD=123'
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-order:/var/lib/postgresql/data
+
+
+volumes:
+  db-order:
