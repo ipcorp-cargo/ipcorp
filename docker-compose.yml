@@ -1,7 +1,5 @@
 version: '3.9'
 
-
-
 services:
 
   db-order:
@@ -14,9 +12,27 @@ services:
       - 'POSTGRES_PASSWORD=123'
     ports:
       - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - db-order:/var/lib/postgresql/data
 
 
+  db-auth:
+    image:  postgres:15-alpine
+    restart: always
+    container_name: db-auth
+    environment:
+      - 'POSTGRES_USER=ipcorp'
+      - 'POSTGRES_DB=ipcorp-auth'
+      - 'POSTGRES_PASSWORD=123'
+    ports:
+      - "5434:5432"
+    expose:
+      - "5434"
+    volumes:
+      - db-auth:/var/lib/postgresql/data
+
 volumes:
   db-order:
+  db-auth:
