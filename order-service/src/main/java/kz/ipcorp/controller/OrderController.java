@@ -15,7 +15,6 @@ import java.util.List;
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
-
     private final OrderService orderService;
     @GetMapping
     public ResponseEntity<List<Order>> getAll() {
