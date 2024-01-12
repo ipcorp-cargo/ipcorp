@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="ipcorp-order@localhost" uuid="4fe729f9-c36e-422f-8028-aa380c3cecc1">
+    <data-source source="LOCAL" name="ipcorp-auth@localhost" uuid="3dad02d7-9c63-4c17-b4ef-ef28b611f54b">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/ipcorp-order</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5434/ipcorp-auth</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
@@ -13,11 +13,11 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="ipcorp-auth@localhost" uuid="5bdf24dd-d588-4a46-86b1-0672c19be4d9">
+    <data-source source="LOCAL" name="ipcorp-order@localhost" uuid="c00f8175-54da-4769-9528-c48fe7a0ea1c">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5434/ipcorp-auth</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/ipcorp-order</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
