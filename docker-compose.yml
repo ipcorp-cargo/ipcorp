@@ -54,9 +54,9 @@ services:
       context: ./auth-service
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8082:8082"
     expose:
-      - "8080"
+      - "8082"
     container_name: auth-service
     environment:
       - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
@@ -102,6 +102,7 @@ services:
       - "5432:5432"
     expose:
       - "5432"
+    command: -p 5432
     volumes:
       - db-order:/var/lib/postgresql/data
 
@@ -117,9 +118,10 @@ services:
       - 'POSTGRES_DB=ipcorp-auth'
       - 'POSTGRES_PASSWORD=123'
     ports:
-      - "5434:5432"
+      - "5434:5434"
     expose:
       - "5434"
+    command: -p 5434
     volumes:
       - db-auth:/var/lib/postgresql/data
 
