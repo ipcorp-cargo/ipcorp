@@ -3,6 +3,8 @@ package util;
 import lombok.SneakyThrows;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.rmi.ServerException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,13 +20,14 @@ public class FileManager {
         System.out.println("=============================");
         File directory = new File(UPLOAD_FOLDER_PATH + path);
         System.out.println(directory.getAbsolutePath());
-        if(directory.exists()){
+        Files.createDirectories(Path.of(directory.getAbsolutePath()));
+//        if(directory.exists()){
 //            if(directory.mkdirs()){
-                throw new ServerException("Unable to create folder:" + directory.getAbsolutePath());
+//                throw new ServerException("Unable to create folder:" + directory.getAbsolutePath());
 //            }
-        }else {
-            System.out.println(directory.mkdirs());
-        }
+//        }else {
+//            System.out.println(directory.mkdirs());
+//        }
 
         File file = new File(directory, fileName);
         System.out.println(file.getAbsolutePath());
