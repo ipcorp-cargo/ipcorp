@@ -1,6 +1,5 @@
-package util;
+package kz.ipcorp.util;
 
-import lombok.SneakyThrows;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,30 +8,19 @@ import java.rmi.ServerException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 public class FileManager {
-    public static final String UPLOAD_FOLDER_PATH = "/upload";
+    public static final String UPLOAD_FOLDER_PATH = "upload";
 
     public static String saveFile(InputStream inputStream, String path, String fileName) throws IOException {
-        System.out.println("=============================");
-        System.out.println("path: "+path);
-        System.out.println("=============================");
-        System.out.println("filename: " + fileName);
-        System.out.println("=============================");
-        System.out.println("=============================");
-        File directory = new File(UPLOAD_FOLDER_PATH + path);
-        System.out.println(directory.getAbsolutePath());
-        Files.createDirectories(Path.of(directory.getAbsolutePath()));
-//        if(directory.exists()){
-//            if(directory.mkdirs()){
-//                throw new ServerException("Unable to create folder:" + directory.getAbsolutePath());
-//            }
-//        }else {
-//            System.out.println(directory.mkdirs());
-//        }
+        File directory = new File(UPLOAD_FOLDER_PATH, path);
+        if(!directory.exists()){
+            boolean status = directory.mkdirs();
+            if(!status){
+                throw new ServerException("Unable to create folder:" + directory.getAbsolutePath());
+            }
+        }
 
         File file = new File(directory, fileName);
-        System.out.println(file.getAbsolutePath());
         FileOutputStream fileOutputStream = new FileOutputStream(file, true);
-
         inputStream.transferTo(fileOutputStream);
 
         fileOutputStream.close();
@@ -77,4 +65,11 @@ public class FileManager {
     }
 
 
+    public static byte[] getIcon(String iconPath) throws IOException {
+        Path filePath = Path.of(iconPath);
+        if (!Files.exists(filePath)){
+            throw new FileNotFoundException("File not found: " + iconPath);
+        }
+        return Files.readAllBytes(filePath);
+    }
 }
