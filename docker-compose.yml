@@ -6,33 +6,45 @@ services:
     build:
       context: ./api-gateway
       dockerfile: Dockerfile
+    ports:
+      - "8765:8765"
+    expose:
+      - "8765"
     container_name: api-gateway
     working_dir: /api-gateway
-    links:
-      - cloud-config
-      - eureka-server
-      - auth-service
-      - order-service
-      - db-order
-      - db-auth
+    environment:
+      - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
+      - CONFIG_SERVER=http://cloud-config:8888
+
 
 
   cloud-config:
     build:
       context: ./cloud-config
       dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    expose:
+      - "8888"
     container_name: cloud-config
     working_dir: /cloud-config
+
 
 
   eureka-server:
     build:
       context: ./eureka-server
       dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    expose:
+      - "8761"
     container_name: eureka-server
     working_dir: /eureka-server
-    links:
-      - cloud-config
+    environment:
+      - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
+
+
 
 
 
@@ -41,11 +53,18 @@ services:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    expose:
+      - "8082"
     container_name: auth-service
-    links:
-      - db-auth
-      - cloud-config
-      - eureka-server
+    environment:
+      - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
+      - CONFIG_SERVER=http://cloud-config:8888
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-auth:5434/ipcorp-auth
+      - SPRING_DATASOURCE_USERNAME=ipcorp
+      - SPRING_DATASOURCE_PASSWORD=123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
 
 
@@ -53,7 +72,21 @@ services:
     build:
       context: ./order-service
       dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    expose:
+      - "8081"
     container_name: order-service
+    environment:
+      - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
+      - CONFIG_SERVER=http://cloud-config:8888
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-order:5432/ipcorp-order
+      - SPRING_DATASOURCE_USERNAME=ipcorp
+      - SPRING_DATASOURCE_PASSWORD=123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#      - SPRING_CONFIG_IMPORT=configserver:http://cloud-config:8888
+#      - SPRING_PROFILES_ACTIVE=micro
+
 
 
 
@@ -69,8 +102,10 @@ services:
       - "5432:5432"
     expose:
       - "5432"
+    command: -p 5432
     volumes:
       - db-order:/var/lib/postgresql/data
+
 
 
 
@@ -83,11 +118,13 @@ services:
       - 'POSTGRES_DB=ipcorp-auth'
       - 'POSTGRES_PASSWORD=123'
     ports:
-      - "5434:5432"
+      - "5434:5434"
     expose:
       - "5434"
+    command: -p 5434
     volumes:
       - db-auth:/var/lib/postgresql/data
+
 
 
 
