@@ -88,7 +88,18 @@ services:
 #      - SPRING_PROFILES_ACTIVE=micro
 
 
-
+  media-service:
+    build:
+      context: ./media-service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    expose:
+      - "8083"
+    container_name: media-service
+    environment:
+      - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
+      - CONFIG_SERVER=http://cloud-config:8888
 
   db-order:
     image: postgres:15-alpine
