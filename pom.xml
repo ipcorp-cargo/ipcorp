@@ -16,6 +16,7 @@
         <module>order-service</module>
         <module>auth-service</module>
         <module>media-service</module>
+        <module>market-service</module>
     </modules>
 
     <properties>

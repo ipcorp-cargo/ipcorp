@@ -9,6 +9,7 @@ import kz.ipcorp.service.AuthenticationService;
 import kz.ipcorp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,8 @@ public class AuthController {
     public ResponseEntity<TokenResponseDTO> signIn(@RequestBody SignInRequestDTO signInRequestDTO) {
         return ResponseEntity.ok(authenticationService.signIn(signInRequestDTO));
     }
+
+
 
     @PostMapping("/access-token")
     public ResponseEntity<TokenResponseDTO> accessToken(@RequestBody AccessTokenRequestDTO accessTokenRequestDTO) {

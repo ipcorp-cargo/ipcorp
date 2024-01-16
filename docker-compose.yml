@@ -101,6 +101,24 @@ services:
       - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
       - CONFIG_SERVER=http://cloud-config:8888
 
+
+  market-service:
+    build:
+      context: ./market-service
+      dockerfile: Dockerfile
+    ports:
+      - "8085:8085"
+    expose:
+      - "8085"
+    container_name: market-service
+    environment:
+      - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
+      - CONFIG_SERVER=http://cloud-config:8888
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-market:5435/ipcorp-market
+      - SPRING_DATASOURCE_USERNAME=ipcorp
+      - SPRING_DATASOURCE_PASSWORD=123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
   db-order:
     image: postgres:15-alpine
     restart: always
@@ -116,6 +134,22 @@ services:
     command: -p 5432
     volumes:
       - db-order:/var/lib/postgresql/data
+
+  db-market:
+    image: postgres:15-alpine
+    restart: always
+    container_name: db-market
+    environment:
+      - 'POSTGRES_USER=ipcorp'
+      - 'POSTGRES_PASSWORD=123'
+      - 'POSTGRES_DB=ipcorp-market'
+    ports:
+      - "5435:5435"
+    expose:
+      - "5435"
+    command: -p 5435
+    volumes:
+      - db-market:/var/lib/postgresql/data
 
 
 
@@ -142,4 +176,5 @@ services:
 volumes:
   db-order:
   db-auth:
+  db-market:
 
