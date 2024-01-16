@@ -33,16 +33,11 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> {
-//                    request.anyRequest().permitAll();
                     request.requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers("/swagger-ui/**").permitAll()
+                            .requestMatchers("/v3/api-docs/**").permitAll()
+                            .requestMatchers("/swagger-resources/*").permitAll()
                             .anyRequest().authenticated();
-//                            .requestMatchers("/api/mail/**").permitAll()
-//                            .requestMatchers("/swagger-ui/**").permitAll()
-//                            .requestMatchers("/v3/api-docs/**").permitAll()
-//                            .requestMatchers("/swagger-resources/*").permitAll()
-//                            .requestMatchers("/api/admin").hasAnyAuthority(Role.ADMIN.name())
-//                            .requestMatchers("/api/user").hasAnyAuthority(Role.USER.name())
-//                            .anyRequest().authenticated();
                         })
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
