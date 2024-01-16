@@ -10,15 +10,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/test")
 public class TestController {
-
-
     @GetMapping
-    public String test(Principal principal) {
-        return principal.getName();
-    }
-
-
-    @GetMapping("/test")
     public String test() {
         return "test";
     }
