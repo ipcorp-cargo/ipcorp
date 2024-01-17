@@ -2,7 +2,6 @@ package kz.ipcorp.model.entity;
 
 import jakarta.persistence.*;
 import kz.ipcorp.model.enumuration.Role;
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

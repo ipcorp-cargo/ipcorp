@@ -3,13 +3,13 @@ package kz.ipcorp;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@EnableDiscoveryClient
 public class MarketServiceApplication {
 
     public static void main(String[] args) {
@@ -27,5 +27,12 @@ public class MarketServiceApplication {
                                 .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
                                 .bearerFormat("JWT")));
+    }
+    @Bean
+    public GroupedOpenApi controllerApi() {
+        return GroupedOpenApi.builder()
+                .group("controller-api")
+                .packagesToScan("kz.ipcorp.controller")
+                .build();
     }
 }

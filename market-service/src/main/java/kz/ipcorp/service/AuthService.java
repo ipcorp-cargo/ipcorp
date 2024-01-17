@@ -2,6 +2,7 @@ package kz.ipcorp.service;
 
 import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.model.entity.Seller;
+import kz.ipcorp.model.entity.Verification;
 import kz.ipcorp.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,7 +16,6 @@ import java.util.HashMap;
 import java.util.Optional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AuthService {
 
@@ -33,12 +33,16 @@ public class AuthService {
         verificationService.registerCode(seller);
     }
 
+
+
+    @Transactional
     public void confirmSeller(SellerConfirmDTO sellerConfirmDTO) {
         Seller seller = sellerRepository.findByEmail(sellerConfirmDTO.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("something wrong"));
         verificationService.checkCode(seller, sellerConfirmDTO);
     }
 
+    @Transactional(readOnly = true)
     public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 signInRequestDTO.getEmail(), signInRequestDTO.getPassword()
@@ -46,7 +50,10 @@ public class AuthService {
         System.out.println(authenticate.getPrincipal());
         var user = sellerRepository.findByEmail(signInRequestDTO.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("email or password is incorrect!"));
-
+        Verification verification = verificationService.getVerification(user);
+        if (!verification.getIsConfirmed()) {
+            throw new IllegalArgumentException("seller is not registered");
+        }
         var access = jwtService.generateToken(user);
         var refresh = jwtService.generateRefreshToken(new HashMap<>(), user);
 
@@ -57,6 +64,7 @@ public class AuthService {
         return tokens;
     }
 
+    @Transactional(readOnly = true)
     public TokenResponseDTO accessToken(AccessTokenRequestDTO requestDTO) {
         String email = jwtService.extractUsername(requestDTO.getRefreshToken());
         Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("phone number is incorrect"));
