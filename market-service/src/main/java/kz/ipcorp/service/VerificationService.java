@@ -7,15 +7,12 @@ import kz.ipcorp.model.entity.Verification;
 import kz.ipcorp.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 import static java.time.LocalDateTime.*;
 
@@ -41,7 +38,6 @@ public class VerificationService {
         verification.setCreatedAt(now()); //30 MIN LIMIT
         verification.setCode(generateCode());
         verificationRepository.save(verification);
-        //TODO: mail service send sms
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(fromMail);
         simpleMailMessage.setSubject("confirm you account");
@@ -49,8 +45,6 @@ public class VerificationService {
         simpleMailMessage.setTo(seller.getEmail());
         mailSender
                 .send(simpleMailMessage);
-        //subject "confirm you account"
-        //text короче мына кодты жаз: verification.getCode()
 
     }
 
@@ -65,9 +59,7 @@ public class VerificationService {
             throw new IllegalArgumentException("code is incorrect");
         }
 
-//        verification.setIsConfirmed(true);
         verificationRepository.confirmVerificationForSeller(seller);
-//        verificationRepository.save(verification);
     }
 
     private Integer generateCode() {

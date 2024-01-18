@@ -1,11 +1,7 @@
 package kz.ipcorp.model.entity;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +16,7 @@ public class Seller implements UserDetails{
 
     @Id
     @Column(name = "id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "email", unique = true)
@@ -29,7 +25,9 @@ public class Seller implements UserDetails{
     @Column(name = "password")
     private String password;
 
-
+    @OneToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

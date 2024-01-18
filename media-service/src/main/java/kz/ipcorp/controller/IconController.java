@@ -26,6 +26,6 @@ public class IconController {
 
     @GetMapping("/download")
     ResponseEntity<byte[]> getIcon(@RequestParam("iconPath") String iconPath) throws IOException {
-        return new ResponseEntity<>(FileManager.getIcon(iconPath), HttpStatus.OK);
+        return new ResponseEntity<>(FileManager.getFile(iconPath), HttpStatus.OK);
     }
 }

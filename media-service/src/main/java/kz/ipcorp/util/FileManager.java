@@ -1,18 +1,25 @@
 package kz.ipcorp.util;
 
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+
 import java.io.*;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.rmi.ServerException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+@Slf4j
 public class FileManager {
-    public static final String UPLOAD_FOLDER_PATH = "upload";
+    public static final String UPLOAD_FOLDER_PATH = "/upload";
 
     public static String saveFile(InputStream inputStream, String path, String fileName) throws IOException {
         File directory = new File(UPLOAD_FOLDER_PATH, path);
         if(!directory.exists()){
+            log.info("path: " + directory.getAbsolutePath());
             boolean status = directory.mkdirs();
             if(!status){
                 throw new ServerException("Unable to create folder:" + directory.getAbsolutePath());
@@ -34,6 +41,11 @@ public class FileManager {
         }
         File file = new File(path);
         return file.delete();
+    }
+
+    public static Resource loadFile(String filePath) throws MalformedURLException {
+        Path file = Path.of(filePath);
+        return new UrlResource(filePath);
     }
 
 
@@ -65,7 +77,7 @@ public class FileManager {
     }
 
 
-    public static byte[] getIcon(String iconPath) throws IOException {
+    public static byte[] getFile(String iconPath) throws IOException {
         Path filePath = Path.of(iconPath);
         if (!Files.exists(filePath)){
             throw new FileNotFoundException("File not found: " + iconPath);

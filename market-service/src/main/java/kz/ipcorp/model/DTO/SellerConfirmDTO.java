@@ -8,6 +8,6 @@ import lombok.Setter;
 public class SellerConfirmDTO {
 
     private String email;
-    private String code;
+    private Integer code;
 
 }
