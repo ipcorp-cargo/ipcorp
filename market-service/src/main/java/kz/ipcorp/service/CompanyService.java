@@ -3,6 +3,7 @@ package kz.ipcorp.service;
 import kz.ipcorp.model.DTO.CompanyDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
 import kz.ipcorp.model.entity.Company;
+import kz.ipcorp.model.entity.Seller;
 import kz.ipcorp.model.enumuration.Status;
 import kz.ipcorp.repository.CompanyRepository;
 import kz.ipcorp.repository.SellerRepository;
@@ -41,8 +42,9 @@ public class CompanyService {
     }
 
     @Transactional
-    public void addCompany(CompanyDTO companyDTO){
+    public void addCompany(CompanyDTO companyDTO, String email){
         log.info("companyDTO: " + companyDTO);
+        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("seller not found"));
         Company company = new Company();
         company.setName(companyDTO.getName());
         company.setRegistrationAddress(companyDTO.getRegistrationAddress());
@@ -57,6 +59,7 @@ public class CompanyService {
         }
         company.setBusinessActivities(businessActivities.toString());
         company.setStatus(Status.Not_uploaded);
+        company.setSeller(seller);
 //        company.setSeller(sellerRepository.findByEmail(username).orElse(null));
         companyRepository.save(company);
     }

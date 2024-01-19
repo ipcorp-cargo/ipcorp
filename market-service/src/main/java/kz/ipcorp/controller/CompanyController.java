@@ -41,9 +41,10 @@ public class CompanyController {
     @PostMapping("/register")
     public ResponseEntity<HttpStatus> register(@RequestBody CompanyDTO companyDTO, Principal principal){
         System.out.println("==================================");
-        System.out.println(principal.getName());
+        System.out.println();
+
         System.out.println("==================================");
-        companyService.addCompany(companyDTO);
+        companyService.addCompany(companyDTO, principal.getName());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
