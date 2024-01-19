@@ -49,6 +49,9 @@ public class CompanyService {
     public void addCompany(CompanyDTO companyDTO, String email){
         log.info("companyDTO: " + companyDTO);
         Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("seller not found"));
+        if (seller.getCompany() != null) {
+            throw new IllegalArgumentException("company already exists");
+        }
         Company company = new Company();
         company.setName(companyDTO.getName());
         company.setRegistrationAddress(companyDTO.getRegistrationAddress());
