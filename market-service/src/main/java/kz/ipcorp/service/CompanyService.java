@@ -25,8 +25,12 @@ public class CompanyService {
 
 
     @Transactional(readOnly = true)
-    public CompanyReadDTO getByCompanyName(String companyName) {
-        Company company = companyRepository.findCompanyByName(companyName).orElse(null);
+    public CompanyReadDTO getByCompanyName(String email) {
+        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("seller not found"));
+        Company company = seller.getCompany();
+        if (company == null) {
+            throw new IllegalArgumentException("company doesn't exists");
+        }
         CompanyReadDTO companyReadDTO = new CompanyReadDTO();
         if(company != null) {
             companyReadDTO.setName(company.getName());

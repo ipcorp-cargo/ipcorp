@@ -29,13 +29,13 @@ public class CompanyController {
     private final CompanyService companyService;
     private final LicenseFeignClient licenseFeignClient;
 
+//    @GetMapping
+//    public ResponseEntity<List<CompanyReadDTO>> getAll(){
+//        return new ResponseEntity<>(companyService.getAll(), HttpStatus.OK);
+//    }
     @GetMapping
-    public ResponseEntity<List<CompanyReadDTO>> getAll(){
-        return new ResponseEntity<>(companyService.getAll(), HttpStatus.OK);
-    }
-    @GetMapping("/findByCompanyName")
-    public ResponseEntity<CompanyReadDTO> findCompanyByName(@RequestParam("companyName") String companyName){
-        return new ResponseEntity<>(companyService.getByCompanyName(companyName), HttpStatus.OK);
+    public ResponseEntity<CompanyReadDTO> findCompanyByName(Principal principal){
+        return new ResponseEntity<>(companyService.getByCompanyName(principal.getName()), HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -48,7 +48,7 @@ public class CompanyController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(path = "/register_document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerDocument(@RequestParam("companyName") String companyName, @RequestParam("businessLicense") MultipartFile businessLicense){
         String path = licenseFeignClient.getPathName(businessLicense);
         companyService.savePath(companyName, path);
