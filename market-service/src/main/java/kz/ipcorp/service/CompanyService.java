@@ -61,7 +61,9 @@ public class CompanyService {
         company.setStatus(Status.Not_uploaded);
         company.setSeller(seller);
 //        company.setSeller(sellerRepository.findByEmail(username).orElse(null));
-        companyRepository.save(company);
+        Company savedCompany = companyRepository.save(company);
+        seller.setCompany(savedCompany);
+        sellerRepository.save(seller);
     }
 
     @Transactional
