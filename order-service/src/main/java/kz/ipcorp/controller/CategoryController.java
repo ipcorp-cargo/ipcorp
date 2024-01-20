@@ -30,9 +30,4 @@ public class CategoryController {
         return new ResponseEntity<>(filePathname, HttpStatus.CREATED);
     }
 
-    @GetMapping("/getByCategoryName")
-    public ResponseEntity<CategoryReadDTO> findIcon(@RequestParam("categoryName") String categoryName) {
-        return new ResponseEntity<>(categoryService.getByCategoryName(categoryName), HttpStatus.OK);
-    }
-
 }

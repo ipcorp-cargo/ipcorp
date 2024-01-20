@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -31,9 +30,5 @@ public class CategoryService {
         category.setCategoryName(categoryName);
         category.setIconPath(filePath);
         categoryRepository.save(category);
-    }
-    public CategoryReadDTO getByCategoryName(String categoryName) {
-        Optional<Category> category = categoryRepository.getByCategoryName(categoryName);
-        return category.map(value -> new CategoryReadDTO(value.getCategoryName(), value.getIconPath())).orElseGet(CategoryReadDTO::new);
     }
 }

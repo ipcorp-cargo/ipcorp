@@ -1,5 +1,6 @@
 package kz.ipcorp.service;
 
+import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.CompanyDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
 import kz.ipcorp.model.entity.Company;
@@ -26,13 +27,12 @@ public class CompanyService {
 
     @Transactional(readOnly = true)
     public CompanyReadDTO getByCompanyName(String email) {
-        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("seller not found"));
+        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("seller is not found"));
         Company company = seller.getCompany();
         if (company == null) {
-            throw new IllegalArgumentException("company doesn't exists");
+            throw new NotFoundException("company doesn't exists");
         }
         CompanyReadDTO companyReadDTO = new CompanyReadDTO();
-        if(company != null) {
             companyReadDTO.setName(company.getName());
             companyReadDTO.setRegistrationNumber(company.getRegistrationNumber());
             companyReadDTO.setRegistrationAddress(company.getRegistrationAddress());
@@ -41,16 +41,15 @@ public class CompanyService {
             companyReadDTO.setBusinessActivities(business);
             companyReadDTO.setStatus(company.getStatus());
             companyReadDTO.setPathToBusinessLicense(company.getPathToBusinessLicense());
-        }
         return companyReadDTO;
     }
 
     @Transactional
     public void addCompany(CompanyDTO companyDTO, String email){
         log.info("companyDTO: " + companyDTO);
-        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("seller not found"));
+        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("seller is not found"));
         if (seller.getCompany() != null) {
-            throw new IllegalArgumentException("company already exists");
+            throw new NotFoundException("company already exists");
         }
         Company company = new Company();
         company.setName(companyDTO.getName());
@@ -67,7 +66,6 @@ public class CompanyService {
         company.setBusinessActivities(businessActivities.toString());
         company.setStatus(Status.Not_uploaded);
         company.setSeller(seller);
-//        company.setSeller(sellerRepository.findByEmail(username).orElse(null));
         Company savedCompany = companyRepository.save(company);
         seller.setCompany(savedCompany);
         sellerRepository.save(seller);

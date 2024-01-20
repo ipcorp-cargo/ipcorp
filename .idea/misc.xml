@@ -11,11 +11,13 @@
         <option value="$PROJECT_DIR$/media-service/pom.xml" />
         <option value="$PROJECT_DIR$/shop-service/pom.xml" />
         <option value="$PROJECT_DIR$/market-service/pom.xml" />
+        <option value="$PROJECT_DIR$/exception-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/eureka-client/pom.xml" />
+        <option value="$PROJECT_DIR$/exception/pom.xml" />
       </set>
     </option>
     <option name="workspaceImportForciblyTurnedOn" value="true" />

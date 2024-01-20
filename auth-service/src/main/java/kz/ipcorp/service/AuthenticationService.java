@@ -1,5 +1,6 @@
 package kz.ipcorp.service;
 
+import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.AccessTokenRequestDTO;
 import kz.ipcorp.model.DTO.SignInRequestDTO;
 import kz.ipcorp.model.DTO.SignUpRequestDTO;
@@ -51,7 +52,7 @@ public class AuthenticationService {
         ));
         System.out.println(authenticate.getPrincipal());
         var user = userRepository.findByPhoneNumber(signInRequestDTO.getPhoneNumber())
-                .orElseThrow(() -> new IllegalArgumentException("phone number or password is incorrect!"));
+                .orElseThrow(() -> new NotFoundException("user is not found"));
 
         var access = jwtService.generateToken(user);
         var refresh = jwtService.generateRefreshToken(new HashMap<>(), user);
@@ -65,7 +66,7 @@ public class AuthenticationService {
 
     public TokenResponseDTO accessToken(AccessTokenRequestDTO requestDTO) {
         String phoneNumber = jwtService.extractUsername(requestDTO.getRefreshToken());
-        User user = userRepository.findByPhoneNumber(phoneNumber).orElseThrow(() -> new IllegalArgumentException("phone number is incorrect"));
+        User user = userRepository.findByPhoneNumber(phoneNumber).orElseThrow(() -> new NotFoundException("user is not found"));
         if (jwtService.isTokenValid(requestDTO.getRefreshToken(), user)) {
             var access = jwtService.generateToken(user);
 
