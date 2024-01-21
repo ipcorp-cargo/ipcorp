@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -21,9 +23,9 @@ public class ProductService {
     private final CompanyService companyService;
 
     @Transactional
-    public void saveProduct(ProductSaveDTO productSaveDTO, String email) {
+    public void saveProduct(ProductSaveDTO productSaveDTO, UUID id) {
 
-        Seller seller = sellerService.getByEmail(email);
+        Seller seller = sellerService.getById(id);
         Company company = seller.getCompany();
         if (company == null || company.getStatus() != Status.ACCEPT) {
             throw new NotConfirmedException("company not registered or verified");

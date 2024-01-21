@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/company")
@@ -25,12 +26,12 @@ public class CompanyController {
 
     @GetMapping
     public ResponseEntity<CompanyReadDTO> getCompany(Principal principal){
-        return new ResponseEntity<>(companyService.getCompany(principal.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(companyService.getCompany(UUID.fromString(principal.getName())), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<HttpStatus> registerCompany(@RequestBody CompanyCreateDTO companyDTO, Principal principal){
-        companyService.registerCompany(companyDTO, principal.getName());
+        companyService.registerCompany(companyDTO, UUID.fromString(principal.getName()));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

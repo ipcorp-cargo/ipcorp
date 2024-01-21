@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/products")
@@ -21,7 +22,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<HttpStatus> saveProduct(@RequestBody ProductSaveDTO productSaveDTO, Principal principal) {
-        productService.saveProduct(productSaveDTO, principal.getName());
+        productService.saveProduct(productSaveDTO, UUID.fromString(principal.getName()));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

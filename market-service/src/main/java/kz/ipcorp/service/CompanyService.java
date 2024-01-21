@@ -5,7 +5,6 @@ import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
 import kz.ipcorp.model.entity.Company;
 import kz.ipcorp.model.entity.Seller;
-import kz.ipcorp.model.enumuration.Status;
 import kz.ipcorp.repository.CompanyRepository;
 import kz.ipcorp.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +23,8 @@ public class CompanyService {
 
 
     @Transactional(readOnly = true)
-    public CompanyReadDTO getCompany(String email) {
-        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("seller is not found"));
+    public CompanyReadDTO getCompany(UUID id) {
+        Seller seller = sellerRepository.findById(id).orElseThrow(() -> new NotFoundException("seller is not found"));
         Company company = seller.getCompany();
         if (company == null) {
             throw new NotFoundException("company doesn't exists");
@@ -43,8 +40,8 @@ public class CompanyService {
     }
 
     @Transactional
-    public void registerCompany(CompanyCreateDTO companyCreateDTO, String email){
-        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("seller is not found"));
+    public void registerCompany(CompanyCreateDTO companyCreateDTO, UUID id){
+        Seller seller = sellerRepository.findById(id).orElseThrow(() -> new NotFoundException("seller is not found"));
         if (seller.getCompany() != null) {
             throw new NotFoundException("company already exists");
         }

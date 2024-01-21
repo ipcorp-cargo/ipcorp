@@ -23,6 +23,7 @@ public class SellerService {
         return seller;
     }
 
+
     public Seller getByEmail(String email) {
         Seller seller = sellerRepository.findByEmail(email).orElseThrow(() ->
                 new NotFoundException(String.format("seller with email %s not found", email)));
