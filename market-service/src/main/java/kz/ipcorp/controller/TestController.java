@@ -11,7 +11,8 @@ import java.security.Principal;
 @RequestMapping("/api/test")
 public class TestController {
     @GetMapping
-    public String test() {
-        return "test";
+    public String test(Principal principal) {
+        return principal.getName();
     }
+
 }

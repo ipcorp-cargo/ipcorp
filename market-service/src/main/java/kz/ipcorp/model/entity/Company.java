@@ -3,9 +3,10 @@ package kz.ipcorp.model.entity;
 import jakarta.persistence.*;
 import kz.ipcorp.model.enumuration.Status;
 import lombok.Data;
-import lombok.ToString;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -27,12 +28,12 @@ public class Company {
     @Column(name = "registration_addres")
     private String registrationAddress;
 
-    @Column(name = "business_activities")
-    private String businessActivities;
+    @Column(name = "business_activity")
+    private String businessActivity;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.NOT_UPLOADED;
 
     @OneToOne
     @JoinColumn(name = "seller_id", referencedColumnName = "id")
@@ -40,4 +41,7 @@ public class Company {
 
     @Column(name = "path_to_business_license")
     private String pathToBusinessLicense;
+
+    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+    private List<Product> products = new ArrayList<>();
 }

@@ -5,30 +5,36 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import kz.ipcorp.model.entity.Seller;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
 public class JWTService {
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(Seller seller) {
+        System.out.println("============================");
+        System.out.println("seller id: " + seller.getId());
+        System.out.println("============================");
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
+                .setSubject(seller.getId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateRefreshToken(Map<String, Object> extraClaims, Seller seller) {
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(seller.getId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 604800000))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
@@ -50,14 +56,17 @@ public class JWTService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public UUID extractID(String token) {
+        return UUID.fromString(extractClaim(token, Claims::getSubject));
+    }
+
     private Key getSignKey() {
         byte[] key = Decoders.BASE64.decode("aaecfe6f0be6d8cb425b27aff443ea6c78bca65576a4e487eeb98a473988691e");
         return Keys.hmacShaKeyFor(key);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    public boolean isTokenValid(String token) {
+        return !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

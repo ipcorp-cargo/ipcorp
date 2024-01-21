@@ -11,15 +11,29 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler(value = {NotFoundException.class, NotConfirmedException.class})
-    public ResponseEntity<?> handleApiRequestException(NotFoundException e){
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> handleApiRequestException(NotFoundException e) {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
 
         ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
                 e.getMessage(),
-                HttpStatus.NOT_FOUND.toString()
+                HttpStatus.NOT_FOUND.value()
         );
 
         return new ResponseEntity<>(apiExceptionResponse, httpStatus);
     }
+
+    @ExceptionHandler(NotConfirmedException.class)
+    public ResponseEntity<?> handleApiRequestException(NotConfirmedException e) {
+        HttpStatus httpStatus = HttpStatus.PRECONDITION_FAILED;
+
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
+                e.getMessage(),
+                HttpStatus.PRECONDITION_FAILED.value()
+        );
+
+        return new ResponseEntity<>(apiExceptionResponse, httpStatus);
+    }
+
+
 }

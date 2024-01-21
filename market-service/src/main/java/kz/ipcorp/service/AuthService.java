@@ -45,18 +45,17 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                signInRequestDTO.getEmail(), signInRequestDTO.getPassword()
-        ));
-        System.out.println(authenticate.getPrincipal());
-        var user = sellerRepository.findByEmail(signInRequestDTO.getEmail())
+//        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+//                signInRequestDTO.getEmail(), signInRequestDTO.getPassword()
+//        ));
+        var seller = sellerRepository.findByEmail(signInRequestDTO.getEmail())
                 .orElseThrow(() -> new NotFoundException("seller is not found"));
-        Verification verification = verificationService.getVerification(user);
+        Verification verification = verificationService.getVerification(seller);
         if (!verification.getIsConfirmed()) {
             throw new NotConfirmedException("seller is not confirmed");
         }
-        var access = jwtService.generateToken(user);
-        var refresh = jwtService.generateRefreshToken(new HashMap<>(), user);
+        var access = jwtService.generateToken(seller);
+        var refresh = jwtService.generateRefreshToken(new HashMap<>(), seller);
 
         TokenResponseDTO tokens = new TokenResponseDTO();
         tokens.setAccessToken(access);
@@ -69,7 +68,7 @@ public class AuthService {
     public TokenResponseDTO accessToken(String refreshToken) {
         String email = jwtService.extractUsername(refreshToken);
         Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("seller is not found"));
-        if (jwtService.isTokenValid(refreshToken, seller)) {
+        if (jwtService.isTokenValid(refreshToken)) {
             var access = jwtService.generateToken(seller);
 
             TokenResponseDTO tokens = new TokenResponseDTO();

@@ -1,7 +1,7 @@
 package kz.ipcorp.service;
 
 import kz.ipcorp.exception.NotFoundException;
-import kz.ipcorp.model.DTO.CompanyDTO;
+import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
 import kz.ipcorp.model.entity.Company;
 import kz.ipcorp.model.entity.Seller;
@@ -26,7 +26,7 @@ public class CompanyService {
 
 
     @Transactional(readOnly = true)
-    public CompanyReadDTO getByCompanyName(String email) {
+    public CompanyReadDTO getCompany(String email) {
         Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("seller is not found"));
         Company company = seller.getCompany();
         if (company == null) {
@@ -36,35 +36,23 @@ public class CompanyService {
             companyReadDTO.setName(company.getName());
             companyReadDTO.setRegistrationNumber(company.getRegistrationNumber());
             companyReadDTO.setRegistrationAddress(company.getRegistrationAddress());
-            List<String> business = new ArrayList<>();
-            Collections.addAll(business, company.getBusinessActivities().split(","));
-            companyReadDTO.setBusinessActivities(business);
+            companyReadDTO.setBusinessActivity(company.getBusinessActivity());
             companyReadDTO.setStatus(company.getStatus());
             companyReadDTO.setPathToBusinessLicense(company.getPathToBusinessLicense());
         return companyReadDTO;
     }
 
     @Transactional
-    public void addCompany(CompanyDTO companyDTO, String email){
-        log.info("companyDTO: " + companyDTO);
+    public void registerCompany(CompanyCreateDTO companyCreateDTO, String email){
         Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("seller is not found"));
         if (seller.getCompany() != null) {
             throw new NotFoundException("company already exists");
         }
         Company company = new Company();
-        company.setName(companyDTO.getName());
-        company.setRegistrationAddress(companyDTO.getRegistrationAddress());
-        StringBuilder businessActivities = new StringBuilder();
-        List<String> businessAc = companyDTO.getBusinessActivities();
-        for (int i = 0; i < businessAc.size(); i++) {
-            if (i < businessAc.size() - 1) {
-                businessActivities.append(businessAc.get(i)).append(",");
-            }else{
-                businessActivities.append(businessAc.get(i));
-            }
-        }
-        company.setBusinessActivities(businessActivities.toString());
-        company.setStatus(Status.Not_uploaded);
+        company.setName(companyCreateDTO.getName());
+        company.setRegistrationAddress(companyCreateDTO.getRegistrationAddress());
+        company.setBusinessActivity(companyCreateDTO.getBusinessActivity());
+        company.setRegistrationNumber(company.getRegistrationNumber());
         company.setSeller(seller);
         Company savedCompany = companyRepository.save(company);
         seller.setCompany(savedCompany);
@@ -77,21 +65,26 @@ public class CompanyService {
     }
 
 
-    @Transactional(readOnly = true)
-    public List<CompanyReadDTO> getAll(){
-        List<CompanyReadDTO> companies = new ArrayList<>();
-        log.info("companies: " + companyRepository.findAll());
-        for(Company company : companyRepository.findAll()){
-            List<String> business = new ArrayList<>();
-            Collections.addAll(business, company.getBusinessActivities().split(","));
-           companies.add(new CompanyReadDTO(company.getName(),
-                    company.getRegistrationNumber(),
-                    company.getRegistrationAddress(),
-                    business,
-                    company.getStatus(),
-                    company.getPathToBusinessLicense()));
-        }
-        return companies;
+//    @Transactional(readOnly = true)
+//    public List<CompanyReadDTO> getAll(){
+//        List<CompanyReadDTO> companies = new ArrayList<>();
+//        log.info("companies: " + companyRepository.findAll());
+//        for(Company company : companyRepository.findAll()){
+//            List<String> business = new ArrayList<>();
+//            Collections.addAll(business, company.getBusinessActivities().split(","));
+//           companies.add(new CompanyReadDTO(company.getName(),
+//                    company.getRegistrationNumber(),
+//                    company.getRegistrationAddress(),
+//                    business,
+//                    company.getStatus(),
+//                    company.getPathToBusinessLicense()));
+//        }
+//        return companies;
+//    }
+
+    @Transactional
+    public void saveCompany(Company company) {
+        companyRepository.save(company);
     }
 }
 

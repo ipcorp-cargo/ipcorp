@@ -4,13 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @Setter
 @ToString
-public class CompanyDTO {
+public class CompanyCreateDTO {
     private String name;
     private String registrationAddress;
-    private List<String> businessActivities;
+    private Long registrationNumber;
+    private String businessActivity;
 }

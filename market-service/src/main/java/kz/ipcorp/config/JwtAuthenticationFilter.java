@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kz.ipcorp.model.entity.Seller;
 import kz.ipcorp.service.JWTService;
 import kz.ipcorp.service.SellerService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -41,17 +43,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         token = authHeader.substring(7);
-        String gmail = jwtService.extractUsername(token);
+        UUID sellerId = jwtService.extractID(token);
 
-        if (StringUtils.isNotEmpty(gmail) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = sellerService.userDetailsService().loadUserByUsername(gmail);
+        if (StringUtils.isNotEmpty(sellerId.toString()) && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if (jwtService.isTokenValid(token, userDetails)) {
+            if (jwtService.isTokenValid(token)) {
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-
+                Seller serviceById = sellerService.getById(sellerId);
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities()
+                                sellerId, null, serviceById.getAuthorities()
                         );
                 usernamePasswordAuthenticationToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)

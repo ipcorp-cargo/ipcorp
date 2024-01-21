@@ -14,7 +14,7 @@ public class CompanyReadDTO {
     private String name;
     private Long registrationNumber;
     private String registrationAddress;
-    private List<String> businessActivities;
+    private String businessActivity;
     private Status status;
     private String pathToBusinessLicense;
 }
