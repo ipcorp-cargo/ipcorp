@@ -13,13 +13,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
     private final IconFeignClient iconFeignClient;
     @GetMapping
-    public ResponseEntity<List<CategoryReadDTO>> getAll(){
+    public ResponseEntity<List<CategoryReadDTO>> getAll(@RequestHeader(value = "username", required = false) String username){
+        System.out.println("============================");
+        System.out.println("username: "+username);
+        System.out.println("============================");
         return new ResponseEntity<>(categoryService.getAll(), HttpStatus.OK);
     }
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

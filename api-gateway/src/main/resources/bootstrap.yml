@@ -11,3 +11,8 @@ spring:
               - DELETE
               - PUT
               - PATCH
+springdoc:
+  webjars:
+    prefix: /api
+  swagger-ui:
+    enabled: true

@@ -15,7 +15,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    //TODO: sign in method token accessToken, refreshToken
     @PostMapping("/signup")
     public ResponseEntity<HttpStatus> signup(@RequestBody SellerCreateDTO sellerCreateDTO) {
         authService.registerSeller(sellerCreateDTO);
