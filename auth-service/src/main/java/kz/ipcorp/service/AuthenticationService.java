@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -51,11 +53,10 @@ public class AuthenticationService {
     }
 
     public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                signInRequestDTO.getPhoneNumber(), signInRequestDTO.getPassword()
-        ));
-        System.out.println(authenticate.getPrincipal());
-        var user = userRepository.findByPhoneNumber(signInRequestDTO.getPhoneNumber())
+//        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+//                signInRequestDTO.getPhoneNumber(), signInRequestDTO.getPassword()
+//        ));
+        User user = userRepository.findByPhoneNumber(signInRequestDTO.getPhoneNumber())
                 .orElseThrow(() -> new NotFoundException("user is not found"));
 
         var access = jwtService.generateToken(user);
@@ -69,9 +70,11 @@ public class AuthenticationService {
     }
 
     public TokenResponseDTO accessToken(AccessTokenRequestDTO requestDTO) {
-        String phoneNumber = jwtService.extractUsername(requestDTO.getRefreshToken());
-        User user = userRepository.findByPhoneNumber(phoneNumber).orElseThrow(() -> new NotFoundException("user is not found"));
-        if (jwtService.isTokenValid(requestDTO.getRefreshToken(), user)) {
+        UUID userId = UUID.fromString(jwtService.extractID(requestDTO.getRefreshToken()));
+        User user = userRepository.findById(
+                userId
+        ).orElseThrow(() -> new NotFoundException("user is not found"));
+        if (!jwtService.isTokenExpired(requestDTO.getRefreshToken())) {
             var access = jwtService.generateToken(user);
             log.info("IN accessToken - get access token with refresh token");
             TokenResponseDTO tokens = new TokenResponseDTO();

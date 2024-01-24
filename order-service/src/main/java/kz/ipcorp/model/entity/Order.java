@@ -11,13 +11,16 @@ import java.util.UUID;
 public class Order {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private Long id;
+    private UUID id;
 
     @Column(name = "track_code")
     private String trackCode;
 
     @Column(name = "order_name")
     private String orderName;
+
+    @Column(name = "user_id")
+    private UUID userId;
 }

@@ -16,7 +16,7 @@ import java.security.Principal;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/company")
+@RequestMapping("/api/companies")
 @RequiredArgsConstructor
 public class CompanyController {
     private final CompanyService companyService;
