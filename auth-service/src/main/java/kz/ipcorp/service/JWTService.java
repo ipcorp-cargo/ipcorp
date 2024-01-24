@@ -6,6 +6,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import kz.ipcorp.model.entity.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +19,9 @@ import java.util.function.Function;
 
 @Service
 public class JWTService {
-
+    private final Logger log = LogManager.getLogger(JWTService.class);
     public String generateToken(UserDetails userDetails) {
+        log.info("IN generateToken - access token has been generated");
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -28,6 +31,7 @@ public class JWTService {
     }
 
     public String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        log.info("IN generateRefreshToken - refresh token has been generated");
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
@@ -43,6 +47,7 @@ public class JWTService {
     }
 
     private Claims extractAllClaims(String token) {
+        log.info("IN extractAllClaims - extract claims from a token");
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
                 .build().parseClaimsJws(token).getBody();
@@ -59,6 +64,8 @@ public class JWTService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         String username = extractUsername(token);
+        log.info("IN isTokenValid - username: {}", username);
+        log.info("IN isTokenValid - username equals userDetails.getUserName: {}", username.equals(userDetails.getUsername()));
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 

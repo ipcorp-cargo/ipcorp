@@ -8,7 +8,8 @@ import kz.ipcorp.model.entity.Seller;
 import kz.ipcorp.repository.CompanyRepository;
 import kz.ipcorp.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,26 +17,32 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+
 public class CompanyService {
     private final CompanyRepository companyRepository;
     private final SellerRepository sellerRepository;
-
+    private final Logger log = LogManager.getLogger(CompanyService.class);
 
     @Transactional(readOnly = true)
     public CompanyReadDTO getCompany(UUID id) {
         Seller seller = sellerRepository.findById(id).orElseThrow(() -> new NotFoundException("seller is not found"));
         Company company = seller.getCompany();
         if (company == null) {
+            log.error("In getCompany - company doesn't exists9");
             throw new NotFoundException("company doesn't exists");
         }
+        log.info("IN getCompany - companyName: {}", company.getName());
+        return companyToCompanyDTO(company);
+    }
+
+    public CompanyReadDTO companyToCompanyDTO(Company company){
         CompanyReadDTO companyReadDTO = new CompanyReadDTO();
-            companyReadDTO.setName(company.getName());
-            companyReadDTO.setRegistrationNumber(company.getRegistrationNumber());
-            companyReadDTO.setRegistrationAddress(company.getRegistrationAddress());
-            companyReadDTO.setBusinessActivity(company.getBusinessActivity());
-            companyReadDTO.setStatus(company.getStatus());
-            companyReadDTO.setPathToBusinessLicense(company.getPathToBusinessLicense());
+        companyReadDTO.setName(company.getName());
+        companyReadDTO.setRegistrationNumber(company.getRegistrationNumber());
+        companyReadDTO.setRegistrationAddress(company.getRegistrationAddress());
+        companyReadDTO.setBusinessActivity(company.getBusinessActivity());
+        companyReadDTO.setStatus(company.getStatus());
+        companyReadDTO.setPathToBusinessLicense(company.getPathToBusinessLicense());
         return companyReadDTO;
     }
 
@@ -43,6 +50,7 @@ public class CompanyService {
     public void registerCompany(CompanyCreateDTO companyCreateDTO, UUID id){
         Seller seller = sellerRepository.findById(id).orElseThrow(() -> new NotFoundException("seller is not found"));
         if (seller.getCompany() != null) {
+            log.error("IN registerCompany - company already exists");
             throw new NotFoundException("company already exists");
         }
         Company company = new Company();
@@ -53,34 +61,19 @@ public class CompanyService {
         company.setSeller(seller);
         Company savedCompany = companyRepository.save(company);
         seller.setCompany(savedCompany);
+        log.info("IN registerCompany - companyName: {}", company.getName());
         sellerRepository.save(seller);
     }
 
     @Transactional
     public void savePath(String companyName, String pathToBusinessLicense){
+        log.info("IN savePath - companyName: {}, path: {}", companyName, pathToBusinessLicense);
         companyRepository.savePathToBusinessLicense(companyName, pathToBusinessLicense);
     }
 
-
-//    @Transactional(readOnly = true)
-//    public List<CompanyReadDTO> getAll(){
-//        List<CompanyReadDTO> companies = new ArrayList<>();
-//        log.info("companies: " + companyRepository.findAll());
-//        for(Company company : companyRepository.findAll()){
-//            List<String> business = new ArrayList<>();
-//            Collections.addAll(business, company.getBusinessActivities().split(","));
-//           companies.add(new CompanyReadDTO(company.getName(),
-//                    company.getRegistrationNumber(),
-//                    company.getRegistrationAddress(),
-//                    business,
-//                    company.getStatus(),
-//                    company.getPathToBusinessLicense()));
-//        }
-//        return companies;
-//    }
-
     @Transactional
     public void saveCompany(Company company) {
+        log.info("IN saveCompany - companyName: {}", company.getName());
         companyRepository.save(company);
     }
 }

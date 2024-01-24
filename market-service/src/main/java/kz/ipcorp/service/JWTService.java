@@ -6,8 +6,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import kz.ipcorp.model.entity.Seller;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -18,11 +18,10 @@ import java.util.function.Function;
 
 @Service
 public class JWTService {
+    private final Logger log = LogManager.getLogger(JWTService.class);
 
     public String generateToken(Seller seller) {
-        System.out.println("============================");
-        System.out.println("seller id: " + seller.getId());
-        System.out.println("============================");
+        log.info("IN generateToken - access token has been generated");
         return Jwts.builder()
                 .setSubject(seller.getId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -32,6 +31,7 @@ public class JWTService {
     }
 
     public String generateRefreshToken(Map<String, Object> extraClaims, Seller seller) {
+        log.info("IN generateRefreshToken - refresh token has been generated");
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(seller.getId().toString())
@@ -47,6 +47,7 @@ public class JWTService {
     }
 
     private Claims extractAllClaims(String token) {
+        log.info("IN extractAllClaims - extract claims from a token");
         return Jwts.parserBuilder()
                 .setSigningKey(getSignKey())
                 .build().parseClaimsJws(token).getBody();
@@ -66,7 +67,13 @@ public class JWTService {
     }
 
     public boolean isTokenValid(String token) {
-        return !isTokenExpired(token);
+        boolean status = isTokenExpired(token);
+        if(!status){
+            log.info("IN isTokenValid - token has not expired");
+        }else{
+            log.info("IN isTokenValid - token has expired");
+        }
+        return !status;
     }
 
     private boolean isTokenExpired(String token) {

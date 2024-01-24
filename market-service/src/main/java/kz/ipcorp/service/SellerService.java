@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.UUID;
 
@@ -17,9 +19,10 @@ import java.util.UUID;
 public class SellerService {
 
     private final SellerRepository sellerRepository;
-
+    private final Logger log = LogManager.getLogger(SellerService.class);
     public Seller getById(UUID id) {
         Seller seller = sellerRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("seller with id %s not found", id)));
+        log.info("IN getById - id: {}", id.toString());
         return seller;
     }
 
@@ -31,6 +34,7 @@ public class SellerService {
     }
 
     public UserDetailsService userDetailsService() {
+        log.info("IN userDetailsService - find by email");
         return gmail -> sellerRepository.findByEmail(gmail)
                 .orElseThrow(() -> new UsernameNotFoundException("seller not found"));
     }
