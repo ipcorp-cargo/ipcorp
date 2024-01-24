@@ -1,6 +1,6 @@
 package kz.ipcorp.controller;
 
-import kz.ipcorp.dto.CategoryReadDTO;
+import kz.ipcorp.model.DTO.CategoryReadDTO;
 import kz.ipcorp.feign.IconFeignClient;
 import kz.ipcorp.service.CategoryService;
 import lombok.RequiredArgsConstructor;

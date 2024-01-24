@@ -1,4 +1,4 @@
-package kz.ipcorp.dto;
+package kz.ipcorp.model.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package kz.ipcorp.service;
 
-import kz.ipcorp.dto.CategoryReadDTO;
+import kz.ipcorp.model.DTO.CategoryReadDTO;
 import kz.ipcorp.model.entity.Category;
 import kz.ipcorp.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
