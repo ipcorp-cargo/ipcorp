@@ -23,4 +23,8 @@ public class Order {
 
     @Column(name = "user_id")
     private UUID userId;
+
+    @ManyToOne
+    @JoinColumn(name = "container_id", referencedColumnName = "id")
+    private Container container;
 }

@@ -1,7 +1,9 @@
 package kz.ipcorp.service;
 
+import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.OrderCreateDTO;
 import kz.ipcorp.model.DTO.OrderViewDTO;
+import kz.ipcorp.model.entity.Container;
 import kz.ipcorp.model.entity.Order;
 import kz.ipcorp.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +21,9 @@ public class OrderService {
     private final OrderRepository orderRepository;
 
     @Transactional(readOnly = true)
-    public List<Order> getAll() {
-        return orderRepository.findAll();
+    public Order getById(UUID id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("container with id %s not found", id)));
     }
 
     @Transactional
@@ -44,5 +47,11 @@ public class OrderService {
         }
 
         return orders;
+    }
+
+    @Transactional
+    public void addContainer(Order order, Container container) {
+        order.setContainer(container);
+        orderRepository.saveAndFlush(order);
     }
 }

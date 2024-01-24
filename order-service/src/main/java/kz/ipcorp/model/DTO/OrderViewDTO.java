@@ -1,6 +1,5 @@
 package kz.ipcorp.model.DTO;
 
-import jakarta.persistence.Column;
 import kz.ipcorp.model.entity.Order;
 import lombok.Getter;
 import lombok.Setter;

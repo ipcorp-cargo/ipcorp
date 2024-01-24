@@ -3,6 +3,7 @@ package kz.ipcorp.model.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -16,4 +17,8 @@ public class Container {
 
     @Column(name = "name")
     private String name;
+
+    @OneToMany
+    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    private List<Order> orders;
 }
