@@ -9,5 +9,7 @@ import java.util.UUID;
 
 @Repository
 public interface ContainerRepository extends JpaRepository<Container, UUID> {
+
+    boolean existsByName(String name);
     Optional<Container> findContainerByName(String containerName);
 }

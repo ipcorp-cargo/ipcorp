@@ -1,23 +1,20 @@
-package kz.ipcorp.exception;
+package kz.ipcorp.exception.handler;
 
+import kz.ipcorp.exception.AuthException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
 @ControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler(value = {NotFoundException.class})
-    public ResponseEntity<Object> handleApiRequestException(NotFoundException e){
-        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<Object> handleApiUnauthorized(AuthException e){
+        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
         ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
                 e.getMessage(),
-                HttpStatus.NOT_FOUND.value()
+                HttpStatus.UNAUTHORIZED.value()
         );
 
         return new ResponseEntity<>(apiExceptionResponse, httpStatus);

@@ -14,15 +14,15 @@ import java.util.UUID;
 public class ContainerReadDTO {
     private UUID id;
     private String name;
-    private List<OrderViewDTO> orders;
+    private List<OrderViewDTO> orders = new ArrayList<>();
 
     public ContainerReadDTO(Container container) {
         this.id = container.getId();
         this.name = container.getName();
-        List<OrderViewDTO> orderViewDTOList = new ArrayList<>();
-        for (Order order : container.getOrders()){
-            orderViewDTOList.add(new OrderViewDTO(order));
+        if (container.getOrders() != null) {
+            for (Order order : container.getOrders()) {
+                orders.add(new OrderViewDTO(order));
+            }
         }
-        this.orders = orderViewDTOList;
     }
 }

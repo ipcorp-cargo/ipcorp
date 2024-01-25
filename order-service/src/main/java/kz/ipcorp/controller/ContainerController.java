@@ -31,18 +31,16 @@ public class ContainerController {
         return new ResponseEntity<>(containerService.getContainerByName(containerName), HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<HttpStatus> addContainer(@RequestBody ContainerCreateDTO containerCreateDTO){
+    public ResponseEntity<ContainerReadDTO> addContainer(@RequestBody ContainerCreateDTO containerCreateDTO){
         log.info("IN addContainer - containerName: {}", containerCreateDTO.getName());
-        containerService.createContainer(containerCreateDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(containerService.createContainer(containerCreateDTO), HttpStatus.CREATED);
     }
 
     @PostMapping("/{containerId}")
-    public ResponseEntity<HttpStatus> addOrder(@RequestParam("orders") List<UUID> orders,
+    public ResponseEntity<ContainerReadDTO> addOrder(@RequestParam("orders") List<UUID> orders,
                                                @PathVariable("containerId") UUID containerId){
         log.info("IN addOrder - containerId: {}", containerId.toString());
-        containerService.addOrder(orders, containerId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(containerService.addOrder(orders, containerId), HttpStatus.CREATED);
     }
 
     @GetMapping
