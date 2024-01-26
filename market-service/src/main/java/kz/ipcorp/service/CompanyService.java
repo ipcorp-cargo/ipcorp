@@ -80,16 +80,12 @@ public class CompanyService {
     }
 
     @Transactional
-    public void verifyCompany(CompanyVerifyDTO companyVerifyDTO, UUID sellerID) {
-        Seller seller = sellerRepository.findById(sellerID).orElseThrow(
-                () -> new NotFoundException(String.format("seller with %s id not found", sellerID))
+    public void verifyCompany(CompanyVerifyDTO companyVerifyDTO, UUID companyId) {
+        Company company = companyRepository.findById(companyId).orElseThrow(
+                () -> new NotFoundException(
+                        String.format("company with %s id not found", companyId)
+                )
         );
-        Company company = seller.getCompany();
-
-        if (company == null) {
-            throw new NotFoundException("company is not registered");
-        }
-
         StatusVerify statusVerify = companyVerifyDTO.getStatus();
         Status status = convertStatus(statusVerify);
         company.setStatus(status);

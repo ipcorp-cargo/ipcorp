@@ -47,7 +47,7 @@ public class CompanyController {
 
     @PatchMapping("/verify")
     public ResponseEntity<HttpStatus> verifyCompany(@RequestBody CompanyVerifyDTO companyVerifyDTO, Principal principal) {
-        companyService.verifyCompany(companyVerifyDTO, UUID.fromString(principal.getName()));
+        companyService.verifyCompany(companyVerifyDTO, companyVerifyDTO.getCompanyID());
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

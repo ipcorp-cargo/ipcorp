@@ -3,6 +3,8 @@ package kz.ipcorp.model.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +20,13 @@ public class Container {
     @Column(name = "name", unique = true)
     private String name;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @OneToOne
+    private Status status;
+
     @OneToMany
     @JoinColumn(name = "order_id", referencedColumnName = "id")
-    private List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
 }

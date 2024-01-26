@@ -37,6 +37,7 @@ public class ContainerService {
         }
         Container container = new Container();
         container.setName(createDTO.getName());
+//        container.setStatus();
         containerRepository.save(container);
         return new ContainerReadDTO(container);
     }

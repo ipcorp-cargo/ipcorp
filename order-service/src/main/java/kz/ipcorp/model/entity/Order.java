@@ -3,6 +3,7 @@ package kz.ipcorp.model.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -27,4 +28,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "container_id", referencedColumnName = "id")
     private Container container;
+
+    @OneToMany
+    private List<Status> statuses;
 }
