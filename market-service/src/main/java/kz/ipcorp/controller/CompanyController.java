@@ -3,6 +3,7 @@ package kz.ipcorp.controller;
 import kz.ipcorp.feign.LicenseFeignClient;
 import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
+import kz.ipcorp.model.DTO.CompanyVerifyDTO;
 import kz.ipcorp.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,5 +43,11 @@ public class CompanyController {
         String path = licenseFeignClient.getPathName(businessLicense);
         companyService.savePath(companyName, path);
         return new ResponseEntity<>(path, HttpStatus.OK);
+    }
+
+    @PatchMapping("/verify")
+    public ResponseEntity<HttpStatus> verifyCompany(@RequestBody CompanyVerifyDTO companyVerifyDTO, Principal principal) {
+        companyService.verifyCompany(companyVerifyDTO, UUID.fromString(principal.getName()));
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

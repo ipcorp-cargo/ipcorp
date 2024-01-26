@@ -2,7 +2,9 @@ package kz.ipcorp.service;
 
 
 import kz.ipcorp.exception.NotConfirmedException;
+import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.ProductSaveDTO;
+import kz.ipcorp.model.DTO.ProductViewDTO;
 import kz.ipcorp.model.entity.Company;
 import kz.ipcorp.model.entity.Product;
 import kz.ipcorp.model.entity.Seller;
@@ -14,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -45,5 +49,34 @@ public class ProductService {
         company.getProducts().add(product);
         companyService.saveCompany(company);
         log.info("IN saveProduct - productName: {}", product.getName());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductViewDTO> getProducts(UUID sellerId) {
+        Seller seller = sellerService.getById(sellerId);
+        Company company = seller.getCompany();
+
+        checkCompanyStatus(company);
+
+        List<ProductViewDTO> products = new ArrayList<>();
+        System.out.println("=====================");
+        System.out.println(company.getProducts());
+        System.out.println("=====================");
+        for (Product product : company.getProducts()) {
+            products.add(new ProductViewDTO(product));
+        }
+
+        return products;
+    }
+
+    private void checkCompanyStatus(Company company) {
+        if (company == null) {
+            throw new NotFoundException("company is not registered");
+        }
+        switch (company.getStatus()) {
+            case NOT_UPLOADED -> throw new NotConfirmedException("licence is not uploaded");
+            case UPLOADED -> throw new NotConfirmedException("licence is not accepted");
+            case DENY ->  throw new NotConfirmedException("licence status denied");
+        }
     }
 }

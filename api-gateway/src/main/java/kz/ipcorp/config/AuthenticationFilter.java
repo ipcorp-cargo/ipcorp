@@ -26,6 +26,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return (((exchange, chain) -> {
+            System.out.println("======================");
+            System.out.println(exchange.getRequest().getPath());
+            System.out.println("======================");
 
             ServerHttpRequest request = null;
             if (router.isSecured.test(exchange.getRequest())) {

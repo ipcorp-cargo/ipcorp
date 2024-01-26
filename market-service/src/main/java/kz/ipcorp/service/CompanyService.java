@@ -3,8 +3,11 @@ package kz.ipcorp.service;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
+import kz.ipcorp.model.DTO.CompanyVerifyDTO;
 import kz.ipcorp.model.entity.Company;
 import kz.ipcorp.model.entity.Seller;
+import kz.ipcorp.model.enumuration.Status;
+import kz.ipcorp.model.enumuration.StatusVerify;
 import kz.ipcorp.repository.CompanyRepository;
 import kz.ipcorp.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +20,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-
 public class CompanyService {
     private final CompanyRepository companyRepository;
     private final SellerRepository sellerRepository;
@@ -75,6 +77,30 @@ public class CompanyService {
     public void saveCompany(Company company) {
         log.info("IN saveCompany - companyName: {}", company.getName());
         companyRepository.save(company);
+    }
+
+    @Transactional
+    public void verifyCompany(CompanyVerifyDTO companyVerifyDTO, UUID sellerID) {
+        Seller seller = sellerRepository.findById(sellerID).orElseThrow(
+                () -> new NotFoundException(String.format("seller with %s id not found", sellerID))
+        );
+        Company company = seller.getCompany();
+
+        if (company == null) {
+            throw new NotFoundException("company is not registered");
+        }
+
+        StatusVerify statusVerify = companyVerifyDTO.getStatus();
+        Status status = convertStatus(statusVerify);
+        company.setStatus(status);
+        companyRepository.saveAndFlush(company);
+    }
+
+    private Status convertStatus(StatusVerify statusVerify) {
+        return switch (statusVerify) {
+            case ACCEPT -> Status.ACCEPT;
+            case DENY -> Status.DENY;
+        };
     }
 }
 

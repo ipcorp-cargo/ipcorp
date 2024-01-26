@@ -24,6 +24,12 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PostMapping("/sms")
+    public ResponseEntity<HttpStatus> sendSMS(@RequestBody SMSRequestDTO smsRequestDTO) {
+        authService.sendSMS(smsRequestDTO);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
     @PostMapping("/confirm")
     public ResponseEntity<HttpStatus> confirm(@RequestBody SellerConfirmDTO sellerConfirmDTO) {
         log.info("IN confirm with email: {}", sellerConfirmDTO.getEmail());

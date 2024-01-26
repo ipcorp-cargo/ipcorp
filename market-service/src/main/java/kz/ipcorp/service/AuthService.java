@@ -28,16 +28,15 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
     private final Logger log = LogManager.getLogger(AuthService.class);
+
     @Transactional
     public void registerSeller(SellerCreateDTO sellerCreateDTO) {
         Seller seller = new Seller();
         seller.setEmail(sellerCreateDTO.getEmail());
         seller.setPassword(passwordEncoder.encode(sellerCreateDTO.getPassword()));
         sellerRepository.save(seller);
-        verificationService.registerCode(seller);
         log.info("IN registerSeller - sellerEmail: {}", seller.getEmail());
     }
-
 
 
     @Transactional
@@ -82,5 +81,12 @@ public class AuthService {
             return tokens;
         }
         return null;
+    }
+
+    @Transactional
+    public void sendSMS(SMSRequestDTO smsRequestDTO) {
+        Seller seller = sellerRepository.findByEmail(smsRequestDTO.getEmail()).orElseThrow(
+                () -> new NotFoundException(String.format("seller with %s email not found", smsRequestDTO.getEmail())));
+        verificationService.registerCode(seller);
     }
 }
