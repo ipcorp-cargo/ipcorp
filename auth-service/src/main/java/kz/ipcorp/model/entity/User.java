@@ -31,7 +31,6 @@ public class User implements UserDetails {
     private Role role;
 
     @OneToMany
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
     private List<Status> statuses;
 
     public User() {

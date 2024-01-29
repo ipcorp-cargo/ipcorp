@@ -2,10 +2,7 @@ package kz.ipcorp.service;
 
 import kz.ipcorp.exception.DuplicatedEntityException;
 import kz.ipcorp.exception.NotFoundException;
-import kz.ipcorp.model.DTO.ContainerCreateDTO;
-import kz.ipcorp.model.DTO.ContainerReadDTO;
-import kz.ipcorp.model.DTO.ContainerStatusDTO;
-import kz.ipcorp.model.DTO.ContainerOrderDTO;
+import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.model.entity.Container;
 import kz.ipcorp.model.entity.Order;
 import kz.ipcorp.model.entity.Status;
@@ -47,12 +44,12 @@ public class ContainerService {
     }
 
     @Transactional
-    public ContainerReadDTO addOrder(ContainerOrderDTO containerOrderDTO) {
-        log.info("IN addOrder - containerId: {}", containerOrderDTO.getContainerId());
-        Container container = containerRepository.findById(containerOrderDTO.getContainerId())
-                .orElseThrow(() -> new NotFoundException(String.format("container with containerId %s not found", containerOrderDTO.getContainerId())));
+    public ContainerReadDTO addOrder(UUID containerId, ContainerOrderCreateDTO containerOrderCreateDTO) {
+        log.info("IN addOrder - containerId: {}", containerId);
+        Container container = containerRepository.findById(containerId)
+                .orElseThrow(() -> new NotFoundException(String.format("container with containerId %s not found", containerId)));
         List<Order> orders = container.getOrders();
-        for (String trackCode : containerOrderDTO.getOrderTrackCodes()) {
+        for (String trackCode : containerOrderCreateDTO.getOrderTrackCodes()) {
             Order order = orderService.getByTrackCode(trackCode);
             orders.add(order);
             orderService.addContainer(order, container);
@@ -70,12 +67,12 @@ public class ContainerService {
         return new ContainerReadDTO(container);
     }
 
-    public ContainerReadDTO getContainerById(UUID containerId) {
+    public ContainerDetailDTO getContainerById(UUID containerId) {
         log.info("IN getContainerById - containerId: {}", containerId);
         Container container = containerRepository.findById(containerId).
                 orElseThrow(()
                         -> new NotFoundException(String.format("container with containerId %s not found", containerId)));
-        return new ContainerReadDTO(container);
+        return new ContainerDetailDTO(container);
     }
 
     public List<ContainerReadDTO> getAll() {
@@ -89,11 +86,11 @@ public class ContainerService {
     }
 
     @Transactional
-    public void updateContainerStatus(ContainerStatusDTO containerStatusDTO) {
-        Container container = containerRepository.findById(containerStatusDTO.getContainerId())
-                .orElseThrow(() -> new NotFoundException(""));
+    public void updateContainerStatus(UUID containerId, ContainerStatusDTO containerStatusDTO) {
+        Container container = containerRepository.findById(containerId)
+                .orElseThrow(() -> new NotFoundException("container not found"));
         Status status = statusService.findById(containerStatusDTO.getStatusId())
-                .orElseThrow(() -> new NotFoundException(""));
+                .orElseThrow(() -> new NotFoundException("status not found"));
         container.setStatus(status);
         for (Order order : container.getOrders()) {
             orderService.updateOrderStatus(order, status);

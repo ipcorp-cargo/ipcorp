@@ -1,9 +1,6 @@
 package kz.ipcorp.controller;
 
-import kz.ipcorp.model.DTO.ContainerCreateDTO;
-import kz.ipcorp.model.DTO.ContainerReadDTO;
-import kz.ipcorp.model.DTO.ContainerStatusDTO;
-import kz.ipcorp.model.DTO.ContainerOrderDTO;
+import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.service.ContainerService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -21,40 +18,47 @@ import java.util.UUID;
 public class ContainerController {
     private final ContainerService containerService;
     private final Logger log = LogManager.getLogger(CategoryController.class);
+
     @GetMapping("/{containerId}")
-    public ResponseEntity<ContainerReadDTO> getContainer(@PathVariable("containerId") UUID containerId){
+    public ResponseEntity<ContainerDetailDTO> getContainer(@PathVariable("containerId") UUID containerId) {
         log.info("IN getContainer - containerId: {}", containerId.toString());
         return new ResponseEntity<>(containerService.getContainerById(containerId), HttpStatus.OK);
     }
 
     @GetMapping("/containerName")
-    public ResponseEntity<ContainerReadDTO> getContainer(@RequestParam("containerName") String containerName){
+    public ResponseEntity<ContainerReadDTO> getContainer(@RequestParam("containerName") String containerName) {
         log.info("IN getContainer - containerName: {}", containerName);
         return new ResponseEntity<>(containerService.getContainerByName(containerName), HttpStatus.OK);
     }
+
     @PostMapping
-    public ResponseEntity<ContainerReadDTO> addContainer(@RequestBody ContainerCreateDTO containerCreateDTO){
+    public ResponseEntity<ContainerReadDTO> addContainer(@RequestBody ContainerCreateDTO containerCreateDTO) {
         log.info("IN addContainer - containerName: {}", containerCreateDTO.getName());
         return new ResponseEntity<>(containerService.createContainer(containerCreateDTO), HttpStatus.CREATED);
     }
 
 
-    @PostMapping("/containerOrder")
-    public ResponseEntity<ContainerReadDTO> addOrder(@RequestBody ContainerOrderDTO containerOrderDTO){
-        log.info("IN addOrder - containerId: {}", containerOrderDTO.getContainerId());
-        return new ResponseEntity<>(containerService.addOrder(containerOrderDTO), HttpStatus.CREATED);
+    @PostMapping("/{containerId}/order")
+    public ResponseEntity<ContainerReadDTO> addOrder(@RequestHeader(value = "userId", required = false) UUID userID, @PathVariable("containerId") UUID containerId,
+                                                     @RequestBody ContainerOrderCreateDTO containerOrderCreateDTO) {
+        log.info("userID - {}", userID);
+        log.info("IN addOrder - containerId: {}", containerId);
+        return new ResponseEntity<>(containerService.addOrder(containerId, containerOrderCreateDTO), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<ContainerReadDTO>> getAll(){
+    public ResponseEntity<List<ContainerReadDTO>> getAll() {
         log.info("IN getAll - get all containers");
         return new ResponseEntity<>(containerService.getAll(), HttpStatus.OK);
     }
 
-    @PostMapping("/containerStatus")
-    public ResponseEntity<HttpStatus> addStatus(@RequestBody ContainerStatusDTO containerStatusDTO){
-        containerService.updateContainerStatus(containerStatusDTO);
-        log.info("IN addStatus - containerId: {}", containerStatusDTO.getContainerId());
-        return new ResponseEntity<>(HttpStatus.OK);
+    @PostMapping("/{containerId}/status")
+    public ResponseEntity<HttpStatus> addStatus(@PathVariable("containerId") UUID containerId,
+                                                @RequestBody ContainerStatusDTO containerStatusDTO
+                                                ) {
+        containerService.updateContainerStatus(containerId, containerStatusDTO);
+        log.info("che tam");
+        log.info("IN addStatus - containerId: {}", containerId);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

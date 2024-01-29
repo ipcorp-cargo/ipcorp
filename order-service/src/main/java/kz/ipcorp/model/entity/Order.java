@@ -3,6 +3,8 @@ package kz.ipcorp.model.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -31,4 +33,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "status_is")
     private Status status;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderStatus> orderStatuses = new ArrayList<>();
 }

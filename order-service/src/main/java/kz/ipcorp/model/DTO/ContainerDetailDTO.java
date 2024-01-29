@@ -9,15 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
 @Getter
 @Setter
-public class ContainerReadDTO {
+public class ContainerDetailDTO {
     private UUID id;
     private String name;
+    private List<OrderViewDTO> orders = new ArrayList<>();
 
-    public ContainerReadDTO(Container container) {
+    public ContainerDetailDTO(Container container) {
         this.id = container.getId();
         this.name = container.getName();
-
+        for (Order order : container.getOrders()) {
+            orders.add(new OrderViewDTO(order));
+        }
     }
 }
