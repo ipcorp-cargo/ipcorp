@@ -9,6 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @FeignClient(name = "media-service", configuration = FeignSupportConfig.class)
 public interface IconFeignClient {
-    @PostMapping(path = "/icon/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "api/icons/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     String getPathName(@RequestPart("icon") MultipartFile icon);
 }

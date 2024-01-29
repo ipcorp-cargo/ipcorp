@@ -30,7 +30,7 @@ public class Product {
 
     @ElementCollection(targetClass = String.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "product_paths", joinColumns = @JoinColumn(name = "image_path_id"))
-    @Column(name = "imagePath", nullable = false)
+    @Column(name = "imagePath")
     private List<String> imagePaths = new ArrayList<>();
 
     @ManyToOne

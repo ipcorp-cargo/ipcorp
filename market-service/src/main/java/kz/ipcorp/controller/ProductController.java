@@ -1,14 +1,17 @@
 package kz.ipcorp.controller;
 
+import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.ProductSaveDTO;
 import kz.ipcorp.model.DTO.ProductViewDTO;
 import kz.ipcorp.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.List;
@@ -20,16 +23,25 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductService productService;
+    private final MediaFeignClient mediaFeignClient;
     private final Logger log = LogManager.getLogger(ProductController.class);
     @PostMapping
-    public ResponseEntity<HttpStatus> saveProduct(@RequestBody ProductSaveDTO productSaveDTO, Principal principal) {
+    public ResponseEntity<UUID> saveProduct(@RequestBody ProductSaveDTO productSaveDTO, Principal principal) {
         log.info("IN saveProduct - productName: {}, sellerId: {}", productSaveDTO.getName(), UUID.fromString(principal.getName()));
-        productService.saveProduct(productSaveDTO, UUID.fromString(principal.getName()));
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        UUID productId = productService.saveProduct(productSaveDTO, UUID.fromString(principal.getName()));
+        return new ResponseEntity<>(productId,HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<ProductViewDTO>> getProducts(Principal principal) {
         return new ResponseEntity<>(productService.getProducts(UUID.fromString(principal.getName())), HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> saveImage(@PathVariable("productId") UUID productId,
+                                       @RequestParam("images") List<MultipartFile> images){
+        List<String> paths = mediaFeignClient.getPath(images);
+        productService.saveImagePath(productId, paths);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

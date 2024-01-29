@@ -30,7 +30,7 @@ public class ProductService {
     private final Logger log = LogManager.getLogger(ProductService.class);
 
     @Transactional
-    public void saveProduct(ProductSaveDTO productSaveDTO, UUID id) {
+    public UUID saveProduct(ProductSaveDTO productSaveDTO, UUID id) {
 
         Seller seller = sellerService.getById(id);
         Company company = seller.getCompany();
@@ -43,12 +43,12 @@ public class ProductService {
         product.setName(productSaveDTO.getName());
         product.setPrice(productSaveDTO.getPrice());
         product.setDescription(productSaveDTO.getDescription());
-        product.setImagePaths(productSaveDTO.getImagePaths());
         product.setCompany(company);
         productRepository.save(product);
         company.getProducts().add(product);
         companyService.saveCompany(company);
         log.info("IN saveProduct - productName: {}", product.getName());
+        return product.getId();
     }
 
     @Transactional(readOnly = true)
@@ -78,5 +78,13 @@ public class ProductService {
             case UPLOADED -> throw new NotConfirmedException("licence is not accepted");
             case DENY ->  throw new NotConfirmedException("licence status denied");
         }
+    }
+
+    @Transactional
+    public void saveImagePath(UUID productId, List<String> paths) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException(""));
+        product.setImagePaths(paths);
+        productRepository.save(product);
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/license")
+@RequestMapping("api/licenses")
 public class LicenseController {
 
     @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -25,7 +25,7 @@ public class LicenseController {
     }
 
     @GetMapping("/download")
-    ResponseEntity<Resource> getLicense(@RequestParam("licensePath") String licensePath) throws IOException {
-        return new ResponseEntity<>(FileManager.loadFile(licensePath), HttpStatus.OK);
+    ResponseEntity<byte[]> getLicense(@RequestParam("licensePath") String licensePath) throws IOException {
+        return new ResponseEntity<>(FileManager.getFile(licensePath), HttpStatus.OK);
     }
 }

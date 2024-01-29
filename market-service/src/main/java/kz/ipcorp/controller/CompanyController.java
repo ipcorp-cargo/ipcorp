@@ -1,6 +1,6 @@
 package kz.ipcorp.controller;
 
-import kz.ipcorp.feign.LicenseFeignClient;
+import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
 import kz.ipcorp.model.DTO.CompanyVerifyDTO;
@@ -21,7 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CompanyController {
     private final CompanyService companyService;
-    private final LicenseFeignClient licenseFeignClient;
+    private final MediaFeignClient mediaFeignClient;
     private final Logger log = LogManager.getLogger(CompanyController.class);
 
     @GetMapping
@@ -40,7 +40,7 @@ public class CompanyController {
     @PostMapping(path = "/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> registerDocument(@RequestParam("companyName") String companyName, @RequestParam("businessLicense") MultipartFile businessLicense){
         log.info("IN registerDocument - companyName: {}", companyName);
-        String path = licenseFeignClient.getPathName(businessLicense);
+        String path = mediaFeignClient.getPathName(businessLicense);
         companyService.savePath(companyName, path);
         return new ResponseEntity<>(path, HttpStatus.OK);
     }

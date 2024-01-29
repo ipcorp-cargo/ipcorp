@@ -11,7 +11,7 @@ import kz.ipcorp.util.FileManager;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/icon")
+@RequestMapping("api/icons")
 public class IconController {
 
     @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
