@@ -24,9 +24,14 @@ public class Container {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToOne
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
     private Status status;
 
-    @OneToMany
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "container_orders",
+            joinColumns = @JoinColumn(name = "container_id"),
+            inverseJoinColumns = @JoinColumn(name = "order_id")
+    )
     private List<Order> orders = new ArrayList<>();
 }

@@ -5,7 +5,10 @@ import kz.ipcorp.model.DTO.OrderCreateDTO;
 import kz.ipcorp.model.DTO.OrderViewDTO;
 import kz.ipcorp.model.entity.Container;
 import kz.ipcorp.model.entity.Order;
+import kz.ipcorp.model.entity.OrderStatus;
+import kz.ipcorp.model.entity.Status;
 import kz.ipcorp.repository.OrderRepository;
+import kz.ipcorp.repository.OrderStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,14 +23,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final OrderStatusRepository orderStatusRepository;
     private final Logger log = LogManager.getLogger(OrderService.class);
-
-    @Transactional(readOnly = true)
-    public Order getById(UUID orderId) {
-        log.info("IN getById - orderId: {}", orderId);
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException(String.format("container with orderId %s not found", orderId)));
-    }
 
     @Transactional
     public OrderViewDTO createOrder(OrderCreateDTO orderCreateDTO, String userId) {
@@ -38,6 +35,13 @@ public class OrderService {
         order.setUserId(UUID.fromString(userId));
         orderRepository.save(order);
         return new OrderViewDTO(order);
+    }
+
+    @Transactional(readOnly = true)
+    public Order getByTrackCode(String trackCode) {
+        log.info("IN getByTrackCode - trackCode: {}", trackCode);
+        return orderRepository.findByTrackCode(trackCode)
+                .orElseThrow(() -> new NotFoundException(String.format("order with trackCode %s not found", trackCode)));
     }
 
     @Transactional(readOnly = true)
@@ -55,6 +59,17 @@ public class OrderService {
     public void addContainer(Order order, Container container) {
         log.info("IN addContainer - orderName: {}, containerName: {}", order.getOrderName(), container.getName());
         order.setContainer(container);
-        orderRepository.saveAndFlush(order);
+        orderRepository.save(order);
+    }
+
+    @Transactional
+    public void updateOrderStatus(Order order, Status status){
+        log.info("IN addStatus - orderId: {}, statusId: {}", order.getId(), status.getId());
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setStatus(status);
+        orderStatus.setOrder(order);
+        order.setStatus(status);
+        orderRepository.save(order);
+        orderStatusRepository.save(orderStatus);
     }
 }

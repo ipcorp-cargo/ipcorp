@@ -30,6 +30,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany
+    @JoinColumn(name = "status_id", referencedColumnName = "id")
+    private List<Status> statuses;
+
     public User() {
 
     }

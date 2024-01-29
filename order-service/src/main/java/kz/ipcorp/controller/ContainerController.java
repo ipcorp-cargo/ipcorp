@@ -2,6 +2,8 @@ package kz.ipcorp.controller;
 
 import kz.ipcorp.model.DTO.ContainerCreateDTO;
 import kz.ipcorp.model.DTO.ContainerReadDTO;
+import kz.ipcorp.model.DTO.ContainerStatusDTO;
+import kz.ipcorp.model.DTO.ContainerOrderDTO;
 import kz.ipcorp.service.ContainerService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -36,16 +38,23 @@ public class ContainerController {
         return new ResponseEntity<>(containerService.createContainer(containerCreateDTO), HttpStatus.CREATED);
     }
 
-    @PostMapping("/{containerId}")
-    public ResponseEntity<ContainerReadDTO> addOrder(@RequestParam("orders") List<UUID> orders,
-                                               @PathVariable("containerId") UUID containerId){
-        log.info("IN addOrder - containerId: {}", containerId.toString());
-        return new ResponseEntity<>(containerService.addOrder(orders, containerId), HttpStatus.CREATED);
+
+    @PostMapping("/containerOrder")
+    public ResponseEntity<ContainerReadDTO> addOrder(@RequestBody ContainerOrderDTO containerOrderDTO){
+        log.info("IN addOrder - containerId: {}", containerOrderDTO.getContainerId());
+        return new ResponseEntity<>(containerService.addOrder(containerOrderDTO), HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<ContainerReadDTO>> getAll(){
         log.info("IN getAll - get all containers");
         return new ResponseEntity<>(containerService.getAll(), HttpStatus.OK);
+    }
+
+    @PostMapping("/containerStatus")
+    public ResponseEntity<HttpStatus> addStatus(@RequestBody ContainerStatusDTO containerStatusDTO){
+        containerService.updateContainerStatus(containerStatusDTO);
+        log.info("IN addStatus - containerId: {}", containerStatusDTO.getContainerId());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
