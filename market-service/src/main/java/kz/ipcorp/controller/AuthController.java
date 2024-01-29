@@ -39,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<TokenResponseDTO> signin(@RequestBody SignInRequestDTO signInRequestDTO){
-        log.info("IN signin with email: {}", signInRequestDTO.getEmail());
+        log.info("IN signin with email: {} {}", signInRequestDTO.getEmail(), signInRequestDTO.getPassword());
         return new ResponseEntity<>(authService.signIn(signInRequestDTO), HttpStatus.OK);
     }
 

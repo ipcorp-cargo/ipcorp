@@ -51,7 +51,9 @@ public class AuthService {
     public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
         var seller = sellerRepository.findByEmail(signInRequestDTO.getEmail())
                 .orElseThrow(() -> new NotFoundException("seller is not found"));
-        if (!passwordEncoder.encode(signInRequestDTO.getPassword()).equals(seller.getPassword())) {
+        log.info("seller password {}", seller.getPassword());
+        log.info("signInRequestDTO password {}", signInRequestDTO.getPassword());
+        if (!passwordEncoder.matches(signInRequestDTO.getPassword(), seller.getPassword())) {
             throw new AuthenticationException("email or password incorrect");
         }
         log.info("IN signIn - sellerEmail: {}", seller.getEmail());
