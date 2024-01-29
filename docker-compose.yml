@@ -97,6 +97,8 @@ services:
     expose:
       - "8083"
     container_name: media-service
+    volumes:
+      - media-data:/media-service
     environment:
       - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
       - CONFIG_SERVER=http://cloud-config:8888
@@ -111,8 +113,6 @@ services:
     expose:
       - "8085"
     container_name: market-service
-    volumes:
-      - media-data:.
     environment:
       - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
       - CONFIG_SERVER=http://cloud-config:8888
