@@ -1,5 +1,6 @@
 package kz.ipcorp.exception.handler;
 
+import kz.ipcorp.exception.AuthenticationException;
 import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,18 @@ public class ApiExceptionHandler {
         ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
                 e.getMessage(),
                 HttpStatus.PRECONDITION_FAILED.value()
+        );
+
+        return new ResponseEntity<>(apiExceptionResponse, httpStatus);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<?> handleAuthenticationException(AuthenticationException e) {
+        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
+                e.getMessage(),
+                HttpStatus.UNAUTHORIZED.value()
         );
 
         return new ResponseEntity<>(apiExceptionResponse, httpStatus);

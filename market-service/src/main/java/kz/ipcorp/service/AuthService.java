@@ -1,5 +1,6 @@
 package kz.ipcorp.service;
 
+import kz.ipcorp.exception.AuthenticationException;
 import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.*;
@@ -24,7 +25,6 @@ public class AuthService {
 
     private final SellerRepository sellerRepository;
     private final VerificationService verificationService;
-    private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
     private final Logger log = LogManager.getLogger(AuthService.class);
@@ -51,6 +51,9 @@ public class AuthService {
     public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
         var seller = sellerRepository.findByEmail(signInRequestDTO.getEmail())
                 .orElseThrow(() -> new NotFoundException("seller is not found"));
+        if (!passwordEncoder.encode(signInRequestDTO.getPassword()).equals(seller.getPassword())) {
+            throw new AuthenticationException("email or password incorrect");
+        }
         log.info("IN signIn - sellerEmail: {}", seller.getEmail());
         Verification verification = verificationService.getVerification(seller);
         if (!verification.getIsConfirmed()) {
