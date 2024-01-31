@@ -22,10 +22,17 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
     private final Logger log = LogManager.getLogger(AuthController.class);
+
+    /**TODO:
+     * SignUpRequestDTO(phoneNumber, password, verificationCode)
+     *
+     *
+     * */
     @PostMapping("/signup")
-    public ResponseEntity<User> signUp(@RequestBody SignUpRequestDTO signUpRequestDTO) {
+    public ResponseEntity<HttpStatus> signUp(@RequestBody SignUpRequestDTO signUpRequestDTO) {
+        authenticationService.createUser(signUpRequestDTO);
         log.info("IN signUp - phoneNumber: {}", signUpRequestDTO.getPhoneNumber());
-        return ResponseEntity.ok(authenticationService.createUser(signUpRequestDTO));
+        return ResponseEntity.ok(HttpStatus.CREATED);
     }
 
     @PostMapping("/signin")
@@ -40,5 +47,11 @@ public class AuthController {
     public ResponseEntity<TokenResponseDTO> accessToken(@RequestBody AccessTokenRequestDTO accessTokenRequestDTO) {
         log.info("IN accessToken - get access token with refresh token");
         return ResponseEntity.ok(authenticationService.accessToken(accessTokenRequestDTO));
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<Void> resetPassword(@RequestBody SignUpRequestDTO signUpRequestDTO){
+        authenticationService.resetPassword(signUpRequestDTO);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

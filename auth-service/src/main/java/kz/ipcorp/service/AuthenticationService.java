@@ -1,5 +1,7 @@
 package kz.ipcorp.service;
 
+import kz.ipcorp.exception.AuthenticationException;
+import kz.ipcorp.exception.DuplicateEntityException;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.AccessTokenRequestDTO;
 import kz.ipcorp.model.DTO.SignInRequestDTO;
@@ -11,15 +13,11 @@ import kz.ipcorp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -31,7 +29,7 @@ public class AuthenticationService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final AuthenticationManager authenticationManager;
+    private final SMSVerificationService verificationService;
 
     private final JWTService jwtService;
     private final Logger log = LogManager.getLogger(AuthenticationService.class);
@@ -42,20 +40,28 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public User createUser(SignUpRequestDTO signUpRequestDTO) {
+    public void createUser(SignUpRequestDTO signUpRequestDTO) {
+        if(!verificationService.isVerificationCodeValid(
+                signUpRequestDTO.getPhoneNumber(),
+                signUpRequestDTO.getVerificationCode())){
+            throw new AuthenticationException("sms verification code incorrect");
+        }
+
+        if (userRepository.findByPhoneNumber(signUpRequestDTO.getPhoneNumber()).isPresent()){
+            throw new DuplicateEntityException("there is already a user with this number");
+        }
+
+
         User user = new User();
         user.setPhoneNumber(signUpRequestDTO.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
         user.setRole(Role.USER);
-        User savedUser = userRepository.save(user);
+        userRepository.save(user);
+        verificationService.invalidateVerificationCode(signUpRequestDTO.getPhoneNumber());
         log.info("IN createUser - phoneNumber: {}", signUpRequestDTO.getPhoneNumber());
-        return savedUser;
     }
 
     public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
-//        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-//                signInRequestDTO.getPhoneNumber(), signInRequestDTO.getPassword()
-//        ));
         User user = userRepository.findByPhoneNumber(signInRequestDTO.getPhoneNumber())
                 .orElseThrow(() -> new NotFoundException("user is not found"));
 
@@ -84,6 +90,25 @@ public class AuthenticationService {
         }
         log.info("IN accessToken - can't get tokens, refresh token is valid");
         return null;
+    }
+
+    public void resetPassword(SignUpRequestDTO signUpRequestDTO){
+        String newPassword = signUpRequestDTO.getPassword();
+        String verificationCode = signUpRequestDTO.getVerificationCode();
+        String phoneNumber = signUpRequestDTO.getPhoneNumber();
+
+        if(!verificationService.isVerificationCodeValid(phoneNumber, verificationCode)){
+            throw new AuthenticationException("sms verification code incorrect");
+        }
+
+        if (newPassword == null || newPassword.isEmpty()){
+            throw new RuntimeException();
+        }
+
+        User user = userRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new NotFoundException("user not found this phone number"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
     }
 
 }

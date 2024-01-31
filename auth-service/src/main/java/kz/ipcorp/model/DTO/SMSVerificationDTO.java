@@ -1,11 +1,11 @@
 package kz.ipcorp.model.DTO;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-public class SignUpRequestDTO {
-
+@Getter
+@Setter
+public class SMSVerificationDTO {
     private String phoneNumber;
-    private String password;
     private String verificationCode;
 }
