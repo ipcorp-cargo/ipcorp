@@ -44,7 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/access-token")
-    public ResponseEntity<TokenResponseDTO> accessToken(@CookieValue String refreshToken) {
+    public ResponseEntity<TokenResponseDTO> accessToken(@CookieValue(name="refreshToken") String refreshToken) {
         return ResponseEntity.ok(authService.accessToken(refreshToken));
     }
 }
