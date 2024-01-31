@@ -31,7 +31,7 @@ public class SMSVerificationService {
     public void requestSMS(String phoneNumber, SMSRequestType type) {
         if (type != SMSRequestType.FORGOT_PASSWORD){
             if(userRepository.findByPhoneNumber(phoneNumber).isPresent()){
-                throw new DuplicateEntityException(String.format("user not found with phoneNumber %s", phoneNumber));
+                throw new DuplicateEntityException("there is already a user with this phone number");
             }
         }
 

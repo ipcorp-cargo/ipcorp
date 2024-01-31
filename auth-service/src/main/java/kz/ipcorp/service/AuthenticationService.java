@@ -3,6 +3,7 @@ package kz.ipcorp.service;
 import kz.ipcorp.exception.AuthenticationException;
 import kz.ipcorp.exception.DuplicateEntityException;
 import kz.ipcorp.exception.NotFoundException;
+import kz.ipcorp.exception.UserInputException;
 import kz.ipcorp.model.DTO.AccessTokenRequestDTO;
 import kz.ipcorp.model.DTO.SignInRequestDTO;
 import kz.ipcorp.model.DTO.SignUpRequestDTO;
@@ -47,27 +48,32 @@ public class AuthenticationService {
             throw new AuthenticationException("sms verification code incorrect");
         }
 
-        if (userRepository.findByPhoneNumber(signUpRequestDTO.getPhoneNumber()).isPresent()){
-            throw new DuplicateEntityException("there is already a user with this number");
+        if (signUpRequestDTO.getPassword() == null || signUpRequestDTO.getPassword().isEmpty()){
+            throw new UserInputException("Password should not be empty");
         }
-
+        if (userRepository.findByPhoneNumber(signUpRequestDTO.getPhoneNumber()).isPresent()){
+            throw new DuplicateEntityException("there is already a user with this phone number");
+        }
 
         User user = new User();
         user.setPhoneNumber(signUpRequestDTO.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
         user.setRole(Role.USER);
         userRepository.save(user);
-        verificationService.invalidateVerificationCode(signUpRequestDTO.getPhoneNumber());
         log.info("IN createUser - phoneNumber: {}", signUpRequestDTO.getPhoneNumber());
+        verificationService.invalidateVerificationCode(signUpRequestDTO.getPhoneNumber());
     }
 
     public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
         User user = userRepository.findByPhoneNumber(signInRequestDTO.getPhoneNumber())
-                .orElseThrow(() -> new NotFoundException("user is not found"));
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("user with phoneNumber %s not found", signInRequestDTO.getPhoneNumber())));
 
         var access = jwtService.generateToken(user);
         var refresh = jwtService.generateRefreshToken(new HashMap<>(), user);
-
+        if(!passwordEncoder.matches(signInRequestDTO.getPassword(), user.getPassword())){
+            throw new AuthenticationException("phoneNumber or password incorrect");
+        }
         TokenResponseDTO tokens = new TokenResponseDTO();
         tokens.setAccessToken(access);
         tokens.setRefreshToken(refresh);
@@ -77,9 +83,8 @@ public class AuthenticationService {
 
     public TokenResponseDTO accessToken(AccessTokenRequestDTO requestDTO) {
         UUID userId = UUID.fromString(jwtService.extractID(requestDTO.getRefreshToken()));
-        User user = userRepository.findById(
-                userId
-        ).orElseThrow(() -> new NotFoundException("user is not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("user with userId %s not found", userId)));
         if (!jwtService.isTokenExpired(requestDTO.getRefreshToken())) {
             var access = jwtService.generateToken(user);
             log.info("IN accessToken - get access token with refresh token");
@@ -91,7 +96,7 @@ public class AuthenticationService {
         log.info("IN accessToken - can't get tokens, refresh token is valid");
         return null;
     }
-
+    @Transactional
     public void resetPassword(SignUpRequestDTO signUpRequestDTO){
         String newPassword = signUpRequestDTO.getPassword();
         String verificationCode = signUpRequestDTO.getVerificationCode();
@@ -102,13 +107,15 @@ public class AuthenticationService {
         }
 
         if (newPassword == null || newPassword.isEmpty()){
-            throw new RuntimeException();
+            throw new UserInputException("Password should not be empty");
         }
 
         User user = userRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new NotFoundException("user not found this phone number"));
-
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("user with phoneNumber %s not found", phoneNumber)));
         user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        verificationService.invalidateVerificationCode(phoneNumber);
     }
 
 }

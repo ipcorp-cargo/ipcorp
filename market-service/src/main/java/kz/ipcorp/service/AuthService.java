@@ -2,11 +2,10 @@ package kz.ipcorp.service;
 
 import kz.ipcorp.exception.AuthenticationException;
 import kz.ipcorp.exception.DuplicateEntityException;
-import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
+import kz.ipcorp.exception.UserInputException;
 import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.model.entity.Seller;
-import kz.ipcorp.model.entity.Verification;
 import kz.ipcorp.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -51,7 +50,8 @@ public class AuthService {
     @Transactional(readOnly = true)
     public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
         var seller = sellerRepository.findByEmail(signInRequestDTO.getEmail())
-                .orElseThrow(() -> new NotFoundException("seller is not found"));
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("seller with email %s not found", signInRequestDTO.getEmail())));
         log.info("seller password {}", seller.getPassword());
         log.info("signInRequestDTO password {}", signInRequestDTO.getPassword());
         if (!passwordEncoder.matches(signInRequestDTO.getPassword(), seller.getPassword())) {
@@ -71,7 +71,9 @@ public class AuthService {
     @Transactional(readOnly = true)
     public TokenResponseDTO accessToken(String refreshToken) {
         String email = jwtService.extractUsername(refreshToken);
-        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("seller is not found"));
+        Seller seller = sellerRepository.findByEmail(email).
+                orElseThrow(() -> new NotFoundException(
+                        String.format("seller with email %s not found", email)));
         log.info("IN accessToken - sellerEmail: {}", seller.getEmail());
         if (jwtService.isTokenValid(refreshToken)) {
             var access = jwtService.generateToken(seller);
@@ -95,11 +97,11 @@ public class AuthService {
         }
 
         if(newPassword == null || newPassword.isEmpty()){
-            throw new RuntimeException();
+            throw new UserInputException("Password should not be empty");
         }
 
         Seller seller = sellerRepository.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("user not found this email"));
+                .orElseThrow(() -> new NotFoundException(String.format("user with email %s not found", email)));
 
         seller.setPassword(passwordEncoder.encode(newPassword));
         sellerRepository.save(seller);

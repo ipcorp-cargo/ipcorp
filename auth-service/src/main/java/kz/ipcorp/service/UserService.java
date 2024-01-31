@@ -21,15 +21,15 @@ public class UserService {
     private final Logger log = LogManager.getLogger(UserService.class);
 
     public User findById(UUID id) {
-        return userRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(String.format("user not found with id %s", id))
-        );
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("user with id %s not found", id)));
     }
 
     public UserDetailsService userDetailsService() {
         log.info("IN userDetailsService - find by phone number");
         return phoneNumber -> userRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new NotFoundException("user is not found"));
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("user with phoneNumber %s not found", phoneNumber)));
     }
 
 }
