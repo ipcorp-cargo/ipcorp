@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -74,8 +75,8 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public TokenResponseDTO accessToken(String refreshToken) {
-        String email = jwtService.extractUsername(refreshToken);
-        Seller seller = sellerRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("seller is not found"));
+        UUID sellerId = UUID.fromString(jwtService.extractUsername(refreshToken));
+        Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new NotFoundException("seller is not found"));
         log.info("IN accessToken - sellerEmail: {}", seller.getEmail());
         if (jwtService.isTokenValid(refreshToken)) {
             var access = jwtService.generateToken(seller);

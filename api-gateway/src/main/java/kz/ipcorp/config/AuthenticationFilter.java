@@ -29,7 +29,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             System.out.println("======================");
             System.out.println(exchange.getRequest().getPath());
             System.out.println("======================");
-
+            System.out.println("======================");
+            System.out.println(exchange.getRequest().getCookies().get("refreshToken"));
+            System.out.println("======================");
             ServerHttpRequest request = null;
             if (router.isSecured.test(exchange.getRequest())) {
                 if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
