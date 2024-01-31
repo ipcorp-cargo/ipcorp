@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SellerCreateDTO {
-
     private String email;
     private String password;
+    private String verificationCode;
 }

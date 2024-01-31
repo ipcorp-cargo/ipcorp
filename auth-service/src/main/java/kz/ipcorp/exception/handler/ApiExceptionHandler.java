@@ -18,7 +18,7 @@ public class ApiExceptionHandler {
 
         ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
                 e.getMessage(),
-                HttpStatus.NOT_FOUND.toString()
+                httpStatus.value()
         );
 
         return new ResponseEntity<>(apiExceptionResponse, httpStatus);
@@ -30,7 +30,7 @@ public class ApiExceptionHandler {
 
         ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
                 d.getMessage(),
-                HttpStatus.FOUND.toString()
+                httpStatus.value()
         );
         return new ResponseEntity<>(apiExceptionResponse, httpStatus);
     }
@@ -41,7 +41,7 @@ public class ApiExceptionHandler {
 
         ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
                 s.getMessage(),
-                httpStatus.toString()
+                httpStatus.value()
         );
         return new ResponseEntity<>(apiExceptionResponse, httpStatus);
     }
@@ -52,7 +52,7 @@ public class ApiExceptionHandler {
 
         ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
                 a.getMessage(),
-                httpStatus.toString()
+                httpStatus.value()
         );
         return new ResponseEntity<>(apiExceptionResponse, httpStatus);
     }

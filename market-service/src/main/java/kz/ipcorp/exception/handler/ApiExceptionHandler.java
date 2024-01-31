@@ -1,8 +1,6 @@
 package kz.ipcorp.exception.handler;
 
-import kz.ipcorp.exception.AuthenticationException;
-import kz.ipcorp.exception.NotConfirmedException;
-import kz.ipcorp.exception.NotFoundException;
+import kz.ipcorp.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -48,5 +46,25 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiExceptionResponse, httpStatus);
     }
 
+    @ExceptionHandler(value = {DuplicateEntityException.class})
+    public ResponseEntity<?> handleApiDuplicateEntityException(DuplicateEntityException d){
+        HttpStatus httpStatus = HttpStatus.FOUND;
 
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
+                d.getMessage(),
+                HttpStatus.FOUND.value()
+        );
+        return new ResponseEntity<>(apiExceptionResponse, httpStatus);
+    }
+
+    @ExceptionHandler(value = {SMSException.class})
+    public ResponseEntity<?> handleApiSMSException(SMSException s){
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
+                s.getMessage(),
+                httpStatus.value()
+        );
+        return new ResponseEntity<>(apiExceptionResponse, httpStatus);
+    }
 }

@@ -3,7 +3,6 @@ package kz.ipcorp.service;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
-import kz.ipcorp.model.DTO.CompanyVerifyDTO;
 import kz.ipcorp.model.entity.Company;
 import kz.ipcorp.model.entity.Seller;
 import kz.ipcorp.model.enumuration.Status;
@@ -16,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -38,7 +39,7 @@ public class CompanyService {
     }
 
     public CompanyReadDTO companyToCompanyDTO(Company company){
-        CompanyReadDTO companyReadDTO = new CompanyReadDTO();
+        CompanyReadDTO companyReadDTO = new CompanyReadDTO(company);
         companyReadDTO.setName(company.getName());
         companyReadDTO.setRegistrationNumber(company.getRegistrationNumber());
         companyReadDTO.setRegistrationAddress(company.getRegistrationAddress());
@@ -80,13 +81,12 @@ public class CompanyService {
     }
 
     @Transactional
-    public void verifyCompany(CompanyVerifyDTO companyVerifyDTO, UUID companyId) {
+    public void verifyCompany(StatusVerify statusVerify, UUID companyId) {
         Company company = companyRepository.findById(companyId).orElseThrow(
                 () -> new NotFoundException(
                         String.format("company with %s id not found", companyId)
                 )
         );
-        StatusVerify statusVerify = companyVerifyDTO.getStatus();
         Status status = convertStatus(statusVerify);
         company.setStatus(status);
         companyRepository.saveAndFlush(company);
@@ -97,6 +97,25 @@ public class CompanyService {
             case ACCEPT -> Status.ACCEPT;
             case DENY -> Status.DENY;
         };
+    }
+
+    @Transactional(readOnly = true)
+    public List<CompanyReadDTO> getCompanies() {
+        List<CompanyReadDTO> companies = new ArrayList<>();
+        for (Company company : companyRepository.findAll()) {
+            companies.add(new CompanyReadDTO(company));
+        }
+        return companies;
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<CompanyReadDTO> getCompaniesByFilter(Status status) {
+        List<CompanyReadDTO> companies = new ArrayList<>();
+        for (Company company : companyRepository.findAllByStatus(status)) {
+            companies.add(new CompanyReadDTO(company));
+        }
+        return companies;
     }
 }
 

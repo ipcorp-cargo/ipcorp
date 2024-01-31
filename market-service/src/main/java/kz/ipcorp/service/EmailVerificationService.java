@@ -1,45 +1,48 @@
 package kz.ipcorp.service;
 
+
 import kz.ipcorp.exception.DuplicateEntityException;
 import kz.ipcorp.exception.SMSException;
 import kz.ipcorp.model.entity.Verification;
 import kz.ipcorp.model.enumuration.SMSRequestType;
-import kz.ipcorp.model.util.MobizonSMSSender;
-import kz.ipcorp.repository.UserRepository;
+import kz.ipcorp.repository.SellerRepository;
 import kz.ipcorp.repository.VerificationRepository;
+import kz.ipcorp.util.GmailSMSSender;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 
+
 @Service
 @RequiredArgsConstructor
-public class SMSVerificationService {
+public class EmailVerificationService {
     public static final int SMS_REQUEST_LIMIT = 10;
     public static final int LIMIT_RELIEVE_TIME = 24; //unit: hour
     public static final int EXPIRED_TIME = 30; //unit: minute
 
     private final VerificationRepository verificationRepository;
-    private final UserRepository userRepository;
-    private final MobizonSMSSender smsSender;
-    private final Logger log = LogManager.getLogger(SMSVerificationService.class);
+    private final SellerRepository sellerRepository;
+    private final GmailSMSSender gmailSMSSender;
+    private final Logger log = LogManager.getLogger(EmailVerificationService.class);
 
-    public void requestSMS(String phoneNumber, SMSRequestType type) {
-        if (type != SMSRequestType.FORGOT_PASSWORD){
-            if(userRepository.findByPhoneNumber(phoneNumber).isPresent()){
-                throw new DuplicateEntityException("there is already a user with this phone number");
+    @Transactional
+    public void requestSMS(String email, SMSRequestType smsType){
+        if(smsType != SMSRequestType.FORGOT_PASSWORD){
+            if (sellerRepository.findByEmail(email).isPresent()){
+                throw new DuplicateEntityException(String.format("seller not found with email %s", email));
             }
         }
 
-        Verification verification = verificationRepository.findById(phoneNumber)
-                .orElseGet(() -> new Verification(phoneNumber, null));
+        Verification verification = verificationRepository.findById(email)
+                .orElseGet(() -> new Verification(email, null));
 
-        log.info("verification phoneNumber: {}, status: {}", verification.getPhoneNumber(), verification.isValid());
-        if(verification.getCount() >= SMS_REQUEST_LIMIT){
+        if (verification.getCount() >= SMS_REQUEST_LIMIT){
             var now = getTime();
             var nextRequestTime = verification.getCreationDate().plusHours(LIMIT_RELIEVE_TIME);
             if(now.isBefore(nextRequestTime)){
@@ -53,29 +56,32 @@ public class SMSVerificationService {
         verification.setCount(verification.getCount() + 1);
         verification.setCreationDate(getTime());
         verification.setValid(true);
-        smsSender.sendSMS(verification.getPhoneNumber(), verification.getCode());
+        gmailSMSSender.smsSender(verification.getEmail(), verification.getCode());
         verificationRepository.save(verification);
     }
 
-    public boolean isVerificationCodeValid(String phoneNumber, String verificationCode){
-        Optional<Verification> optionalVerification = verificationRepository.findById(phoneNumber);
+    @Transactional(readOnly = true)
+    public boolean isVerificationCodeValid(String email, String verificationCode){
+        Optional<Verification> optionalVerification = verificationRepository.findById(email);
         if(optionalVerification.isEmpty()){
             return false;
         }
 
         Verification verification = optionalVerification.get();
 
-        log.info("phoneNumber: {}, isValid: {}", verification.getPhoneNumber(), verification.isValid());
         var now = getTime();
-        if (now.isAfter(verification.getCreationDate().plusMinutes(EXPIRED_TIME))){
+        if(now.isAfter(verification.getCreationDate().plusMinutes(EXPIRED_TIME))){
             verification.setValid(false);
         }
+
         return verification.isValid() && verification.getCode().equals(verificationCode);
     }
 
-    public void invalidateVerificationCode(String phoneNumber){
-        Optional<Verification> optionalVerification = verificationRepository.findById(phoneNumber);
-        if(optionalVerification.isEmpty()){
+    @Transactional
+    public void invalidateVerificationCode(String email){
+        Optional<Verification> optionalVerification = verificationRepository.findById(email);
+
+        if (optionalVerification.isEmpty()){
             return;
         }
 
@@ -87,7 +93,6 @@ public class SMSVerificationService {
     public LocalDateTime getTime(){
         return LocalDateTime.now(ZoneId.of("UTC"));
     }
-
     private String generateVerificationCode(){
         StringBuilder builder = new StringBuilder();
         for(int i = 0; i< Verification.VERIFICATION_CODE_LENGTH; i++){
