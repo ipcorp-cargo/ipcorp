@@ -20,23 +20,9 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<HttpStatus> signup(@RequestBody SellerCreateDTO sellerCreateDTO) {
         log.info("IN signup with email: {}", sellerCreateDTO.getEmail());
-        authService.registerSeller(sellerCreateDTO);
+        authService.createSeller(sellerCreateDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-    @PostMapping("/sms")
-    public ResponseEntity<HttpStatus> sendSMS(@RequestBody SMSRequestDTO smsRequestDTO) {
-        authService.sendSMS(smsRequestDTO);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-    @PostMapping("/confirm")
-    public ResponseEntity<HttpStatus> confirm(@RequestBody SellerConfirmDTO sellerConfirmDTO) {
-        log.info("IN confirm with email: {}", sellerConfirmDTO.getEmail());
-        authService.confirmSeller(sellerConfirmDTO);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
     @PostMapping("/signin")
     public ResponseEntity<TokenResponseDTO> signin(@RequestBody SignInRequestDTO signInRequestDTO){
         log.info("IN signin with email: {} {}", signInRequestDTO.getEmail(), signInRequestDTO.getPassword());
@@ -46,5 +32,12 @@ public class AuthController {
     @PostMapping("/access-token")
     public ResponseEntity<TokenResponseDTO> accessToken(@CookieValue(name="refreshToken") String refreshToken) {
         return ResponseEntity.ok(authService.accessToken(refreshToken));
+    }
+
+
+    @PostMapping("/password")
+    public ResponseEntity<Void> resetPassword(@RequestBody SellerCreateDTO sellerCreateDTO){
+        authService.resetPassword(sellerCreateDTO);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

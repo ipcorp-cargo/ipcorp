@@ -5,9 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SellerConfirmDTO {
-
+public class SMSVerificationDTO {
     private String email;
-    private Integer code;
-
+    private String verificationCode;
 }
