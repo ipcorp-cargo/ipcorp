@@ -4,6 +4,7 @@ import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.StatusViewDTO;
 import kz.ipcorp.model.entity.Status;
 import kz.ipcorp.model.entity.User;
+import kz.ipcorp.model.entity.UserStatus;
 import kz.ipcorp.repository.StatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,10 @@ public class StatusService {
     public List<StatusViewDTO> getStatus(UUID userId){
         User user = userService.findById(userId);
         List<StatusViewDTO> statuses = new ArrayList<>();
-        for (Status status : user.getStatuses()) {
-            statuses.add(new StatusViewDTO(status));
+        for (UserStatus userStatus : user.getUserStatuses()) {
+            statuses.add(new StatusViewDTO(statusRepository.findById(
+                    userStatus.getStatus().getId()).orElseThrow(() -> new NotFoundException(
+                            String.format("status with statusId %s not found",userStatus.getStatus().getId())))));
         }
         return statuses;
     }

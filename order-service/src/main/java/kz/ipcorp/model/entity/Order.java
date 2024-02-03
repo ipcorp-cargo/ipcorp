@@ -31,7 +31,7 @@ public class Order {
     private Container container;
 
     @ManyToOne
-    @JoinColumn(name = "status_is")
+    @JoinColumn(name = "status_id")
     private Status status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)

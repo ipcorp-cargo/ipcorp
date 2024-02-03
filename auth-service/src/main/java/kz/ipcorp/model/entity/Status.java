@@ -5,15 +5,16 @@ import lombok.Data;
 
 import java.util.UUID;
 
+@Data
 @Entity
 @Table(name = "statuses")
-@Data
 public class Status {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
 }
+
