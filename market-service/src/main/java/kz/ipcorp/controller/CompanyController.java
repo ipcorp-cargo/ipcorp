@@ -46,7 +46,7 @@ public class CompanyController {
     public ResponseEntity<List<CompanyReadDTO>> getCompaniesByFilter(@Parameter(in = ParameterIn.QUERY, name = "status",
             description = "Status filter",
             schema = @Schema(type = "string", allowableValues = {"NOT_UPLOADED", "UPLOADED", "ACCEPT", "DENY"}))
-            @RequestParam("status") Status status) {
+                                                                     @RequestParam("status") Status status) {
         log.info("IN getCompaniesByFilter");
         return new ResponseEntity<>(companyService.getCompaniesByFilter(status), HttpStatus.OK);
     }

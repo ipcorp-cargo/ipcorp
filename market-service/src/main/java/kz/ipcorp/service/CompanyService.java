@@ -1,5 +1,6 @@
 package kz.ipcorp.service;
 
+import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
@@ -15,6 +16,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -72,7 +76,12 @@ public class CompanyService {
     @Transactional
     public void savePath(UUID companyId, String pathToBusinessLicense){
         log.info("IN savePath - companyName: {}, path: {}", companyId, pathToBusinessLicense);
-        companyRepository.savePathToBusinessLicense(companyId, pathToBusinessLicense, Status.UPLOADED);
+        Company company = companyRepository.findById(companyId).orElseThrow(() -> new NotFoundException("company not found"));
+        if (company.getStatus() == Status.ACCEPT || company.getStatus() == Status.UPLOADED) {
+            throw new NotConfirmedException("company can not uploaded document. Document status is accept or waiting");
+        }
+        company.setStatus(Status.UPLOADED);
+        companyRepository.saveAndFlush(company);
     }
 
     @Transactional
@@ -90,6 +99,9 @@ public class CompanyService {
         );
         Status status = convertStatus(statusVerify);
         company.setStatus(status);
+        if (status == Status.ACCEPT) {
+            company.setExpiredAt(LocalDateTime.now().plusYears(1));
+        }
         companyRepository.saveAndFlush(company);
     }
 

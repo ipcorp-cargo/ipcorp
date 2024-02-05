@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +40,10 @@ public class ProductService {
         if (company == null || company.getStatus() != Status.ACCEPT) {
             log.error("IN saveProduct - hasn't company or status not accept");
             throw new NotConfirmedException("company not registered or verified");
+        }
+
+        if (company.getExpiredAt() == null || company.getExpiredAt().isBefore(LocalDateTime.now())) {
+            throw new NotConfirmedException("company's status expired");
         }
 
         Product product = new Product();
