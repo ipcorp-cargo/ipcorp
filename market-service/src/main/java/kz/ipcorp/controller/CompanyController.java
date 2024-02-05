@@ -58,17 +58,16 @@ public class CompanyController {
     }
 
     @PostMapping
-    public ResponseEntity<HttpStatus> registerCompany(@RequestBody CompanyCreateDTO companyDTO, Principal principal) {
+    public ResponseEntity<CompanyReadDTO> registerCompany(@RequestBody CompanyCreateDTO companyDTO, Principal principal) {
         log.info("IN registerCompany - companyName: {}, sellerId: {}", companyDTO.getName(), UUID.fromString(principal.getName()));
-        companyService.registerCompany(companyDTO, UUID.fromString(principal.getName()));
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(companyService.registerCompany(companyDTO, UUID.fromString(principal.getName())), HttpStatus.CREATED);
     }
 
     @PostMapping(path = "/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> registerDocument(@RequestParam("companyName") String companyName, @RequestParam("businessLicense") MultipartFile businessLicense) {
-        log.info("IN registerDocument - companyName: {}", companyName);
+    public ResponseEntity<String> registerDocument(@RequestParam("companyId") UUID companyId, @RequestParam("businessLicense") MultipartFile businessLicense) {
+        log.info("IN registerDocument - companyId: {}", companyId);
         String path = mediaFeignClient.getPathName(businessLicense);
-        companyService.savePath(companyName, path);
+        companyService.savePath(companyId, path);
         return new ResponseEntity<>(path, HttpStatus.OK);
     }
 

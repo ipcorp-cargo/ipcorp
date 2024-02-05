@@ -50,7 +50,7 @@ public class CompanyService {
     }
 
     @Transactional
-    public void registerCompany(CompanyCreateDTO companyCreateDTO, UUID id){
+    public CompanyReadDTO registerCompany(CompanyCreateDTO companyCreateDTO, UUID id){
         Seller seller = sellerRepository.findById(id).orElseThrow(() -> new NotFoundException("seller is not found"));
         if (seller.getCompany() != null) {
             log.error("IN registerCompany - company already exists");
@@ -66,12 +66,13 @@ public class CompanyService {
         seller.setCompany(savedCompany);
         log.info("IN registerCompany - companyName: {}", company.getName());
         sellerRepository.save(seller);
+        return new CompanyReadDTO(savedCompany);
     }
 
     @Transactional
-    public void savePath(String companyName, String pathToBusinessLicense){
-        log.info("IN savePath - companyName: {}, path: {}", companyName, pathToBusinessLicense);
-        companyRepository.savePathToBusinessLicense(companyName, pathToBusinessLicense);
+    public void savePath(UUID companyId, String pathToBusinessLicense){
+        log.info("IN savePath - companyName: {}, path: {}", companyId, pathToBusinessLicense);
+        companyRepository.savePathToBusinessLicense(companyId, pathToBusinessLicense);
     }
 
     @Transactional
