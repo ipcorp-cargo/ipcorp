@@ -81,16 +81,16 @@ public class AuthenticationService {
         return tokens;
     }
 
-    public TokenResponseDTO accessToken(AccessTokenRequestDTO requestDTO) {
-        UUID userId = UUID.fromString(jwtService.extractID(requestDTO.getRefreshToken()));
+    public TokenResponseDTO accessToken(String refreshToken) {
+        UUID userId = UUID.fromString(jwtService.extractID(refreshToken));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("user with userId %s not found", userId)));
-        if (!jwtService.isTokenExpired(requestDTO.getRefreshToken())) {
+        if (!jwtService.isTokenExpired(refreshToken)) {
             var access = jwtService.generateToken(user);
             log.info("IN accessToken - get access token with refresh token");
             TokenResponseDTO tokens = new TokenResponseDTO();
             tokens.setAccessToken(access);
-            tokens.setRefreshToken(requestDTO.getRefreshToken());
+            tokens.setRefreshToken(refreshToken);
             return tokens;
         }
         log.info("IN accessToken - can't get tokens, refresh token is valid");

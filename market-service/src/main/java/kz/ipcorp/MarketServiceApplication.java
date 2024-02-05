@@ -14,7 +14,11 @@ import org.springframework.context.annotation.Bean;
 public class MarketServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MarketServiceApplication.class, args);
+        try {
+            SpringApplication.run(MarketServiceApplication.class, args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     @Bean
     public OpenAPI usersMicroserviceOpenAPI() {

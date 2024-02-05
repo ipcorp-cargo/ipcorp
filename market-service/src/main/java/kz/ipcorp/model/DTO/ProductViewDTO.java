@@ -18,13 +18,19 @@ public class ProductViewDTO {
     private Integer price;
     private String description;
     private List<String> imagePaths = new ArrayList<>();
+    private String categoryName;
 
-    public ProductViewDTO() {}
+    public ProductViewDTO() {
+    }
+
     public ProductViewDTO(Product product) {
         this.id = product.getId();
         this.name = product.getName();
         this.price = product.getPrice();
         this.description = product.getDescription();
         this.imagePaths = new ArrayList<>(product.getImagePaths());
+        if (product.getCategory() != null) {
+            this.categoryName = product.getCategory().getName();
+        }
     }
 }

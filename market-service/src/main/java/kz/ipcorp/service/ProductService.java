@@ -5,6 +5,7 @@ import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.ProductSaveDTO;
 import kz.ipcorp.model.DTO.ProductViewDTO;
+import kz.ipcorp.model.entity.Category;
 import kz.ipcorp.model.entity.Company;
 import kz.ipcorp.model.entity.Product;
 import kz.ipcorp.model.entity.Seller;
@@ -27,6 +28,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final SellerService sellerService;
     private final CompanyService companyService;
+    private final CategoryService categoryService;
     private final Logger log = LogManager.getLogger(ProductService.class);
 
     @Transactional
@@ -44,6 +46,8 @@ public class ProductService {
         product.setPrice(productSaveDTO.getPrice());
         product.setDescription(productSaveDTO.getDescription());
         product.setCompany(company);
+        Category category = categoryService.findById(productSaveDTO.getCategoryId());
+        product.setCategory(category);
         productRepository.save(product);
         company.getProducts().add(product);
         companyService.saveCompany(company);
@@ -81,10 +85,15 @@ public class ProductService {
     }
 
     @Transactional
-    public void saveImagePath(UUID productId, List<String> paths) {
+    public void saveImagePath(UUID productId,String path) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException(""));
-        product.setImagePaths(paths);
+
+        if (product.getImagePaths().size() >= 10) {
+            throw new NotConfirmedException("limit 10 image for product");
+        }
+
+        product.getImagePaths().add(path);
         productRepository.save(product);
     }
 }
