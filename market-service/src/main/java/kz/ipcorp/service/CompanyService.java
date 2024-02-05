@@ -72,7 +72,7 @@ public class CompanyService {
     @Transactional
     public void savePath(UUID companyId, String pathToBusinessLicense){
         log.info("IN savePath - companyName: {}, path: {}", companyId, pathToBusinessLicense);
-        companyRepository.savePathToBusinessLicense(companyId, pathToBusinessLicense);
+        companyRepository.savePathToBusinessLicense(companyId, pathToBusinessLicense, Status.UPLOADED);
     }
 
     @Transactional

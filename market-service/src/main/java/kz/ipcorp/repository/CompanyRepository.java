@@ -18,6 +18,6 @@ public interface CompanyRepository extends JpaRepository<Company, UUID> {
 
     List<Company> findAllByStatus(Status status);
     @Modifying
-    @Query("UPDATE Company c SET c.pathToBusinessLicense = :pathToBusinessLicense WHERE c.id = :companyId")
-    void savePathToBusinessLicense(UUID companyId, String pathToBusinessLicense);
+    @Query("UPDATE Company c SET c.pathToBusinessLicense = :pathToBusinessLicense, c.status = :status WHERE c.id = :companyId")
+    void savePathToBusinessLicense(UUID companyId, String pathToBusinessLicense, Status status);
 }
