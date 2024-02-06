@@ -68,9 +68,6 @@ public class ProductService {
         checkCompanyStatus(company);
 
         List<ProductViewDTO> products = new ArrayList<>();
-        System.out.println("=====================");
-        System.out.println(company.getProducts());
-        System.out.println("=====================");
         for (Product product : company.getProducts()) {
             products.add(new ProductViewDTO(product));
         }
