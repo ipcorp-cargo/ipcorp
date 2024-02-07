@@ -50,6 +50,14 @@ public class ProductService {
         log.info("IN saveProduct - productName: {}", product.getName());
         return product.getId();
     }
+    @Transactional(readOnly = true)
+    public List<ProductViewDTO> getAllProducts(){
+        List<ProductViewDTO> productViewDTOS = new ArrayList<>();
+        for (Product product : productRepository.findAll()){
+            productViewDTOS.add(new ProductViewDTO(product));
+        }
+        return productViewDTOS;
+    }
 
     @Transactional(readOnly = true)
     public List<ProductViewDTO> getProducts(UUID sellerId) {

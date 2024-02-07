@@ -32,9 +32,12 @@ public class ProductController {
         return new ResponseEntity<>(productId,HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping("/product")
     public ResponseEntity<List<ProductViewDTO>> getProducts(Principal principal) {
-        return new ResponseEntity<>(productService.getProducts(UUID.fromString(principal.getName())), HttpStatus.OK);
+        if (principal != null){
+            return new ResponseEntity<>(productService.getProducts(UUID.fromString(principal.getName())), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
     }
 
     @PostMapping(path = "/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
