@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ContainerController {
     private final ContainerService containerService;
-    private final Logger log = LogManager.getLogger(CategoryController.class);
+    private final Logger log = LogManager.getLogger(ContainerController.class);
 
     @GetMapping("/{containerId}")
     public ResponseEntity<ContainerDetailDTO> getContainer(@PathVariable("containerId") UUID containerId) {

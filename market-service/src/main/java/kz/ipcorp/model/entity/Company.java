@@ -5,6 +5,7 @@ import kz.ipcorp.model.enumuration.Status;
 import lombok.Data;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +21,6 @@ public class Company {
 
     @Column(name = "name", unique = true)
     private String name;
-
 
     @Column(name = "registration_number")
     private Long registrationNumber;
@@ -41,6 +41,9 @@ public class Company {
 
     @Column(name = "path_to_business_license")
     private String pathToBusinessLicense;
+
+    @Column(name = "expired_at")
+    private LocalDateTime expiredAt;
 
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();

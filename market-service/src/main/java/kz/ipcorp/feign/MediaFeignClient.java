@@ -15,5 +15,8 @@ public interface MediaFeignClient {
     String getPathName(@RequestPart("license") MultipartFile license);
 
     @PostMapping(path = "api/product/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    List<String> getPath(@RequestPart("images")List<MultipartFile> images);
+    String getPath(@RequestPart("images") MultipartFile images);
+
+    @PostMapping(path = "api/icons/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    String getPathCategoryIcon(@RequestPart("icon") MultipartFile icon);
 }

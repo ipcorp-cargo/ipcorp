@@ -36,4 +36,8 @@ public class Product {
     @ManyToOne
     private Company company;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
 }

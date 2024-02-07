@@ -42,9 +42,9 @@ public class ProductController {
 
     @PostMapping(path = "/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> saveImage(@PathVariable("productId") UUID productId,
-                                       @RequestParam("images") List<MultipartFile> images){
-        List<String> paths = mediaFeignClient.getPath(images);
-        productService.saveImagePath(productId, paths);
+                                       @RequestParam("image") MultipartFile image){
+        String path = mediaFeignClient.getPath(image);
+        productService.saveImagePath(productId, path);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
