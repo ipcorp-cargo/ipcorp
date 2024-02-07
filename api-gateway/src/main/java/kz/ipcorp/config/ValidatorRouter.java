@@ -13,7 +13,9 @@ public class ValidatorRouter {
             "/api/auth/signup",
             "/api/auth/signin",
             "/v3/api-docs",
-            "/swagger-ui/index.html"
+            "/swagger-ui/index.html",
+            "/api/products",
+            "/api/orders"
     );
 
     public Predicate<ServerHttpRequest> isSecured = request ->

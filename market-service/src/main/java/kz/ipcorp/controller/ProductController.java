@@ -32,9 +32,9 @@ public class ProductController {
         return new ResponseEntity<>(productId,HttpStatus.CREATED);
     }
 
-    @GetMapping("/product")
+    @GetMapping
     public ResponseEntity<List<ProductViewDTO>> getProducts(Principal principal) {
-        if (principal != null){
+        if (principal != null) {
             return new ResponseEntity<>(productService.getProducts(UUID.fromString(principal.getName())), HttpStatus.OK);
         }
         return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);

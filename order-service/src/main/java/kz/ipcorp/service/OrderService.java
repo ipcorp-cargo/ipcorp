@@ -72,4 +72,10 @@ public class OrderService {
         orderRepository.save(order);
         orderStatusRepository.save(orderStatus);
     }
+
+    @Transactional(readOnly = true)
+    public OrderViewDTO getOrder(UUID orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("order not found"));
+        return new OrderViewDTO(order);
+    }
 }

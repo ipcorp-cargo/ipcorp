@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -18,6 +19,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final Logger log = LogManager.getLogger(OrderController.class);
+
     @PostMapping
     public ResponseEntity<OrderViewDTO> createOrder(@RequestBody OrderCreateDTO orderCreateDTO,
                                                     @RequestHeader(value = "userId") String userId) {
@@ -29,6 +31,11 @@ public class OrderController {
     public ResponseEntity<List<OrderViewDTO>> getOrders(@RequestHeader(value = "userId", required = false) String userId) {
         log.info("IN getOrders - userId: {}", userId);
         return new ResponseEntity<>(orderService.getOrders(userId), HttpStatus.OK);
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderViewDTO> getOrder(@PathVariable("orderId") UUID orderId) {
+        return ResponseEntity.ok(orderService.getOrder(orderId));
     }
 
 }
