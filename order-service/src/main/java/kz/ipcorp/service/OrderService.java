@@ -74,8 +74,8 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderViewDTO getOrder(UUID orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("order not found"));
+    public OrderViewDTO getOrder(String trackCode) {
+        Order order = orderRepository.findByTrackCode(trackCode).orElseThrow(() -> new NotFoundException("order not found"));
         return new OrderViewDTO(order);
     }
 }

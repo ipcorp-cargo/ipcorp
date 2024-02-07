@@ -33,9 +33,9 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getOrders(userId), HttpStatus.OK);
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderViewDTO> getOrder(@PathVariable("orderId") UUID orderId) {
-        return ResponseEntity.ok(orderService.getOrder(orderId));
-    }
 
+    @GetMapping("/{trackCode}")
+    public ResponseEntity<OrderViewDTO> getOrder(@PathVariable("trackCode") String trackCode) {
+        return ResponseEntity.ok(orderService.getOrder(trackCode));
+    }
 }
