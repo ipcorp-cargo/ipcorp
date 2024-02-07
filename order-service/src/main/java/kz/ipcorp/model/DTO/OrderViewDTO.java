@@ -5,6 +5,7 @@ import kz.ipcorp.model.entity.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class OrderViewDTO {
     private UUID id;
     private String trackCode;
     private String orderName;
-    private List<String> statusList;
+    private List<String> statusList = new ArrayList<>();
 
     public OrderViewDTO() {}
     public OrderViewDTO(Order order) {
@@ -24,7 +25,7 @@ public class OrderViewDTO {
         List<OrderStatus> orderStatuses = order.getOrderStatuses();
         if (orderStatuses != null) {
             for (OrderStatus orderStatus : orderStatuses) {
-                statusList.add(orderStatus.getStatus().getName());
+                this.statusList.add(orderStatus.getStatus().getName());
             }
         }
 //        if(order.getStatus() != null) {
