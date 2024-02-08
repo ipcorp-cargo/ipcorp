@@ -25,5 +25,5 @@ public class OrderStatus {
     private Order order;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 }
