@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -38,6 +37,7 @@ public class OrderController {
     @GetMapping("/{trackCode}")
     public ResponseEntity<OrderDetailDTO> getOrder(@PathVariable("trackCode") String trackCode,
                                                    @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
+        log.info("IN getOrder - trackCode: {}, language: {}", trackCode, language);
         return ResponseEntity.ok(orderService.getOrder(trackCode, language));
     }
 }

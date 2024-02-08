@@ -54,10 +54,8 @@ public class ContainerController {
 
     @PostMapping("/{containerId}/status")
     public ResponseEntity<HttpStatus> addStatus(@PathVariable("containerId") UUID containerId,
-                                                @RequestBody ContainerStatusDTO containerStatusDTO
-                                                ) {
+                                                @RequestBody ContainerStatusDTO containerStatusDTO) {
         containerService.updateContainerStatus(containerId, containerStatusDTO);
-        log.info("che tam");
         log.info("IN addStatus - containerId: {}", containerId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }

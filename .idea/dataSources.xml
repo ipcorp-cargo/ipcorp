@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="order database" uuid="ccda20ae-a4f0-45f1-acee-0458aa6b996f">
+    <data-source source="LOCAL" name="ipcorp-order@localhost" uuid="8c174aa3-07c3-4c75-951c-8f3df136f871">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
@@ -9,12 +9,11 @@
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
-        <property name="com.intellij.clouds.kubernetes.db.resource.type" value="Deployment" />
         <property name="com.intellij.clouds.kubernetes.db.container.port" />
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="auth database" uuid="4ca67ce1-fc5c-4f02-9ae3-41aa29f2af9f">
+    <data-source source="LOCAL" name="ipcorp-auth@localhost" uuid="7c853737-8398-4edc-be93-4465f3cf3c6c">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
@@ -26,23 +25,11 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="ipcorp-auth@ipcorpn.com" uuid="d391b564-6c9f-4755-8d7f-045be73b8843">
+    <data-source source="LOCAL" name="ipcorp-market@localhost" uuid="fa9254c5-e9ed-47d4-9ed2-4481c4f6dbbd">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://ipcorpn.com:5434/ipcorp-auth</jdbc-url>
-      <jdbc-additional-properties>
-        <property name="com.intellij.clouds.kubernetes.db.host.port" />
-        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
-        <property name="com.intellij.clouds.kubernetes.db.container.port" />
-      </jdbc-additional-properties>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
-    <data-source source="LOCAL" name="ipcorp-order@localhost" uuid="8c174aa3-07c3-4c75-951c-8f3df136f871">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/ipcorp-order</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5435/ipcorp-market</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />

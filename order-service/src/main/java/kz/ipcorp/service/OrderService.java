@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -30,12 +31,11 @@ public class OrderService {
         order.setOrderName(orderCreateDTO.getOrderName());
         order.setUserId(UUID.fromString(userId));
         orderRepository.save(order);
-        OrderViewDTO orderViewDTO = OrderViewDTO.builder()
+        return OrderViewDTO.builder()
                 .id(order.getId())
                 .orderName(order.getOrderName())
                 .trackCode(order.getTrackCode())
                 .build();
-        return orderViewDTO;
     }
 
     @Transactional(readOnly = true)
@@ -69,78 +69,64 @@ public class OrderService {
     }
 
     @Transactional
-    public void updateOrderStatus(Order order, Status status) {
+    public void createOrderStatus(Order order, Status status) {
         log.info("IN addStatus - orderId: {}, statusId: {}", order.getId(), status.getId());
         OrderStatus orderStatus = new OrderStatus();
         orderStatus.setStatus(status);
         orderStatus.setOrder(order);
+        orderStatusRepository.save(orderStatus);
+
+        List<OrderStatus> orderStatuses = order.getOrderStatuses();
+        orderStatuses.add(orderStatus);
+        order.setOrderStatuses(orderStatuses);
         order.setStatus(status);
         orderRepository.save(order);
-        orderStatusRepository.save(orderStatus);
     }
 
     @Transactional(readOnly = true)
     public OrderDetailDTO getOrder(String trackCode, String language) {
-        Order order = orderRepository.findByTrackCode(trackCode).orElseThrow(() -> new NotFoundException("order not found"));
         log.info("IN getOrder {} {}", trackCode, language);
-        OrderDetailDTO orderViewDTO = OrderDetailDTO.builder()
+        Order order = orderRepository.findByTrackCode(trackCode).orElseThrow(
+                () -> new NotFoundException("order not found"));
+        for (OrderStatus orderStatus : order.getOrderStatuses()) {
+            log.info("orderStatus: {}", orderStatus.getStatus().getId());
+        }
+        return OrderDetailDTO.builder()
                 .id(order.getId())
                 .orderName(order.getOrderName())
                 .trackCode(order.getTrackCode())
+                .time(LocalDateTime.now())
                 .statusList(statusConverter(order.getOrderStatuses(), language))
                 .build();
-        return orderViewDTO;
     }
 
     private List<Map<String, String>> statusConverter(List<OrderStatus> orderStatuses, String language) {
-//        TODO:
         List<Map<String, String>> statuses = new ArrayList<>();
-        log.info(orderStatuses.size());
+        log.info("language: {}", language);
         for (OrderStatus orderStatus : orderStatuses) {
             Status status = orderStatus.getStatus();
             log.info("status {}", status);
             Language statusLanguage = status.getLanguage();
-            log.info(statusLanguage.getChinese());
-            log.info(statusLanguage.getEnglish());
-            log.info(statusLanguage.getRussian());
-            log.info(statusLanguage.getKazakh());
-//            String acceptLanguage = switch (language) {
-//                case "en" -> statusLanguage.getEnglish();
-//                case "kk" -> statusLanguage.getKazakh();
-//                case "ru" -> statusLanguage.getRussian();
-//                case "cn" -> statusLanguage.getChinese();
-//                default -> throw new IllegalStateException("Unexpected value: " + language);
-//            };
-            if (language.equals("en")) {
-                statuses.add(Map.of(
+            switch (language) {
+                case "en" -> statuses.add(Map.of(
                         "status" , statusLanguage.getEnglish(),
                         "time" , orderStatus.getCreatedAt().toString()
                 ));
-            } else if(language.equals("ru")) {
-                statuses.add(Map.of(
-                        "status" , statusLanguage.getRussian(),
-                        "time" , orderStatus.getCreatedAt().toString()
-                ));
-            } else if(language.equals("cn")) {
-                statuses.add(Map.of(
-                        "status" , statusLanguage.getChinese(),
-                        "time" , orderStatus.getCreatedAt().toString()
-                ));
-            } else {
-                statuses.add(Map.of(
+                case "kz" -> statuses.add(Map.of(
                         "status" , statusLanguage.getKazakh(),
                         "time" , orderStatus.getCreatedAt().toString()
                 ));
+                case "ru" -> statuses.add(Map.of(
+                        "status" , statusLanguage.getRussian(),
+                        "time" , orderStatus.getCreatedAt().toString()
+                ));
+                case "ch" -> statuses.add(Map.of(
+                        "status" , statusLanguage.getChinese(),
+                        "time" , orderStatus.getCreatedAt().toString()
+                ));
+                default -> throw new IllegalStateException("Unexpected value: " + language);
             }
-
-
         }
-
         return statuses;
-    }
-
-    @Transactional
-    public Order saveOrder(Order order) {
-        return orderRepository.save(order);
     }
 }

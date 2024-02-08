@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -50,13 +49,12 @@ public class ContainerService {
 
         Container container = containerRepository.findById(containerId)
                 .orElseThrow(() -> new NotFoundException(String.format("container with containerId %s not found", containerId)));
-
         Order order = orderService.getByTrackCode(trackCode).
-                orElse(orderService.saveOrder(new Order()));
-
+                orElseThrow(() -> new NotFoundException(String.format("order with track code %s not found", trackCode)));
         container.getOrders().add(order);
+
         Container savedContainer = containerRepository.saveAndFlush(container);
-        order.setContainer(savedContainer);
+        orderService.addContainer(order, savedContainer);
         return new ContainerReadDTO(container);
     }
 
@@ -80,21 +78,22 @@ public class ContainerService {
         log.info("IN getAll - get all containers");
         List<Container> containers = containerRepository.findAll();
         List<ContainerReadDTO> containerReadDTOList = new ArrayList<>();
-        for (Container c : containers) {
-            containerReadDTOList.add(new ContainerReadDTO(c));
+        for (Container container : containers) {
+            containerReadDTOList.add(new ContainerReadDTO(container));
         }
         return containerReadDTOList;
     }
 
     @Transactional
     public void updateContainerStatus(UUID containerId, ContainerStatusDTO containerStatusDTO) {
+        log.info("IN updateContainerStatus - containerId: {}, statusId: {}", containerId, containerStatusDTO.getStatusId());
         Container container = containerRepository.findById(containerId)
                 .orElseThrow(() -> new NotFoundException("container not found"));
         Status status = statusService.findById(containerStatusDTO.getStatusId())
                 .orElseThrow(() -> new NotFoundException("status not found"));
         container.setStatus(status);
         for (Order order : container.getOrders()) {
-            orderService.updateOrderStatus(order, status);
+            orderService.createOrderStatus(order, status);
             log.info("order: {}", order.getOrderName());
         }
         containerRepository.save(container);

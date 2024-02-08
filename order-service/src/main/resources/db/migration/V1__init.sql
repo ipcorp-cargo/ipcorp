@@ -59,22 +59,22 @@ CREATE TABLE IF NOT EXISTS order_status
 
 
 INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (1, null, 'Order received', null, null);
+VALUES (1, 'Тапсырыс алынды', 'Order received', 'Заказ получен', '收到的订单');
 
 INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (2, null, 'Shipped from the warehouse', null, null);
+VALUES (2, 'Қоймадан жөнелтілді', 'Shipped from the warehouse', 'Отгружено со склада', '从仓库发货');
 
 INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (3, null, 'Under customs clearance', null, null);
+VALUES (3, 'Кедендік ресімдеу кезінде', 'Under customs clearance', 'При таможенном оформлении', '海关清关服务');
 
 INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (4, null, 'In Almaty sorting point', null, null);
+VALUES (4, 'Алматы сұрыптау пунктінде', 'In Almaty sorting point', 'В Алматинском сортировочном пункте', '在阿拉木图分拣点');
 
 INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (5, null, 'Ready to pick up', null, null);
+VALUES (5, 'Алып кетуге дайын', 'Ready to pick up', 'Готовы забрать', '准备接电话');
 
 INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (6, null, 'Delivered', null, null);
+VALUES (6, 'Жеткізілді', 'Delivered', 'Доставлен', '交付');
 
 
 
