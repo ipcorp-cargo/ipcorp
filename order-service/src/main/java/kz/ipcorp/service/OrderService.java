@@ -91,8 +91,8 @@ public class OrderService {
                 .orderName(order.getOrderName())
                 .trackCode(order.getTrackCode())
                 .statusList(statusConverter(order.getOrderStatuses(), language))
+                .time(order.getContainer().getCreatedAt())
                 .build();
-
         return orderViewDTO;
     }
 
