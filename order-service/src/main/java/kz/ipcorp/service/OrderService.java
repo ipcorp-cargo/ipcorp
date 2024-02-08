@@ -13,10 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -91,14 +88,13 @@ public class OrderService {
                 .orderName(order.getOrderName())
                 .trackCode(order.getTrackCode())
                 .statusList(statusConverter(order.getOrderStatuses(), language))
-                .time(order.getContainer().getCreatedAt())
                 .build();
         return orderViewDTO;
     }
 
-    private List<String> statusConverter(List<OrderStatus> orderStatuses, String language) {
+    private List<Map<String, String>> statusConverter(List<OrderStatus> orderStatuses, String language) {
 //        TODO:
-        List<String> statuses = new ArrayList<>();
+        List<Map<String, String>> statuses = new ArrayList<>();
         log.info(orderStatuses.size());
         for (OrderStatus orderStatus : orderStatuses) {
             Status status = orderStatus.getStatus();
@@ -116,13 +112,25 @@ public class OrderService {
 //                default -> throw new IllegalStateException("Unexpected value: " + language);
 //            };
             if (language.equals("en")) {
-                statuses.add(statusLanguage.getEnglish());
+                statuses.add(Map.of(
+                        "status" , statusLanguage.getEnglish(),
+                        "time" , orderStatus.getCreatedAt().toString()
+                ));
             } else if(language.equals("ru")) {
-                statuses.add(statusLanguage.getRussian());
+                statuses.add(Map.of(
+                        "status" , statusLanguage.getRussian(),
+                        "time" , orderStatus.getCreatedAt().toString()
+                ));
             } else if(language.equals("cn")) {
-                statuses.add(statusLanguage.getChinese());
+                statuses.add(Map.of(
+                        "status" , statusLanguage.getChinese(),
+                        "time" , orderStatus.getCreatedAt().toString()
+                ));
             } else {
-                statuses.add(statusLanguage.getKazakh());
+                statuses.add(Map.of(
+                        "status" , statusLanguage.getKazakh(),
+                        "time" , orderStatus.getCreatedAt().toString()
+                ));
             }
 
 

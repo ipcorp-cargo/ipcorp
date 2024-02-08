@@ -55,7 +55,8 @@ public class ContainerService {
                 orElse(orderService.saveOrder(new Order()));
 
         container.getOrders().add(order);
-        containerRepository.saveAndFlush(container);
+        Container savedContainer = containerRepository.saveAndFlush(container);
+        order.setContainer(savedContainer);
         return new ContainerReadDTO(container);
     }
 
