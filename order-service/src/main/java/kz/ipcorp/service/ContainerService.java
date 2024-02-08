@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -44,17 +45,16 @@ public class ContainerService {
     }
 
     @Transactional
-    public ContainerReadDTO addOrder(UUID containerId, ContainerOrderCreateDTO containerOrderCreateDTO) {
+    public ContainerReadDTO addOrder(UUID containerId, String trackCode) {
         log.info("IN addOrder - containerId: {}", containerId);
+
         Container container = containerRepository.findById(containerId)
                 .orElseThrow(() -> new NotFoundException(String.format("container with containerId %s not found", containerId)));
-        List<Order> orders = container.getOrders();
-        for (String trackCode : containerOrderCreateDTO.getOrderTrackCodes()) {
-            Order order = orderService.getByTrackCode(trackCode);
-            orders.add(order);
-            orderService.addContainer(order, container);
-        }
-        container.setOrders(orders);
+
+        Order order = orderService.getByTrackCode(trackCode).
+                orElse(orderService.saveOrder(new Order()));
+
+        container.getOrders().add(order);
         containerRepository.saveAndFlush(container);
         return new ContainerReadDTO(container);
     }

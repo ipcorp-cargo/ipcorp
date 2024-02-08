@@ -34,6 +34,7 @@ public class Order {
     @JoinColumn(name = "status_id")
     private Status status;
 
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderStatus> orderStatuses = new ArrayList<>();
 }

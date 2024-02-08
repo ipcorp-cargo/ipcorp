@@ -1,6 +1,7 @@
 package kz.ipcorp.controller;
 
 import kz.ipcorp.model.DTO.OrderCreateDTO;
+import kz.ipcorp.model.DTO.OrderDetailDTO;
 import kz.ipcorp.model.DTO.OrderViewDTO;
 import kz.ipcorp.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,8 @@ public class OrderController {
 
 
     @GetMapping("/{trackCode}")
-    public ResponseEntity<OrderViewDTO> getOrder(@PathVariable("trackCode") String trackCode) {
-        return ResponseEntity.ok(orderService.getOrder(trackCode));
+    public ResponseEntity<OrderDetailDTO> getOrder(@PathVariable("trackCode") String trackCode,
+                                                   @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
+        return ResponseEntity.ok(orderService.getOrder(trackCode, language));
     }
 }

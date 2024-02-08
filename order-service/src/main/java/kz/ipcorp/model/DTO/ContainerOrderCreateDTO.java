@@ -8,5 +8,5 @@ import java.util.List;
 @Getter
 @Setter
 public class ContainerOrderCreateDTO {
-    private List<String> orderTrackCodes;
+    private String trackCode;
 }

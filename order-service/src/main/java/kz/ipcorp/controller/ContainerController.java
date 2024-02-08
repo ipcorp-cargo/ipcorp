@@ -43,7 +43,7 @@ public class ContainerController {
                                                      @RequestBody ContainerOrderCreateDTO containerOrderCreateDTO) {
         log.info("userID - {}", userID);
         log.info("IN addOrder - containerId: {}", containerId);
-        return new ResponseEntity<>(containerService.addOrder(containerId, containerOrderCreateDTO), HttpStatus.CREATED);
+        return new ResponseEntity<>(containerService.addOrder(containerId, containerOrderCreateDTO.getTrackCode()), HttpStatus.CREATED);
     }
 
     @GetMapping

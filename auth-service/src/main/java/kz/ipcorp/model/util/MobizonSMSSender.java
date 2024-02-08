@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MobizonSMSSender {
-    private static final String apiKey = "kz380e1cac45a01fc13f3222dd362113bf0d1311b1104bacadb39794da2432f4dae70f";
+    private static final String apiKey = "kzcaa11f82ace278b86af07261c431d2e9e3d09b39631f4ff28e617d66c9ec9772fdc1";
     private static final String verificationMessage = """
             You verification code is %s ,\s
             please don't show anyone else.

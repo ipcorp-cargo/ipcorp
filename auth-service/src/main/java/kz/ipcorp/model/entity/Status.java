@@ -14,7 +14,10 @@ public class Status {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "name", unique = true)
-    private String name;
+
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "language_id")
+    private Language language;
+
 }
 

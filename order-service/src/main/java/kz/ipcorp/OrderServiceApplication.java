@@ -13,7 +13,12 @@ import org.springframework.context.annotation.Bean;
 public class OrderServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(OrderServiceApplication.class, args);
+        System.out.println("hello");
+        try {
+            SpringApplication.run(OrderServiceApplication.class, args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     @Bean
     public OpenAPI usersMicroserviceOpenAPI() {

@@ -2,11 +2,9 @@ package kz.ipcorp.service;
 
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.OrderCreateDTO;
+import kz.ipcorp.model.DTO.OrderDetailDTO;
 import kz.ipcorp.model.DTO.OrderViewDTO;
-import kz.ipcorp.model.entity.Container;
-import kz.ipcorp.model.entity.Order;
-import kz.ipcorp.model.entity.OrderStatus;
-import kz.ipcorp.model.entity.Status;
+import kz.ipcorp.model.entity.*;
 import kz.ipcorp.repository.OrderRepository;
 import kz.ipcorp.repository.OrderStatusRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,14 +33,18 @@ public class OrderService {
         order.setOrderName(orderCreateDTO.getOrderName());
         order.setUserId(UUID.fromString(userId));
         orderRepository.save(order);
-        return new OrderViewDTO(order);
+        OrderViewDTO orderViewDTO = OrderViewDTO.builder()
+                .id(order.getId())
+                .orderName(order.getOrderName())
+                .trackCode(order.getTrackCode())
+                .build();
+        return orderViewDTO;
     }
 
     @Transactional(readOnly = true)
-    public Order getByTrackCode(String trackCode) {
+    public Optional<Order> getByTrackCode(String trackCode) {
         log.info("IN getByTrackCode - trackCode: {}", trackCode);
-        return orderRepository.findByTrackCode(trackCode)
-                .orElseThrow(() -> new NotFoundException(String.format("order with trackCode %s not found", trackCode)));
+        return orderRepository.findByTrackCode(trackCode);
     }
 
     @Transactional(readOnly = true)
@@ -50,7 +53,13 @@ public class OrderService {
         List<Order> ordersList = orderRepository.findAllByUserId(UUID.fromString(userId));
         List<OrderViewDTO> orders = new ArrayList<>();
         for (Order order : ordersList) {
-            orders.add(new OrderViewDTO(order));
+            orders.add(
+                    OrderViewDTO.builder()
+                            .id(order.getId())
+                            .orderName(order.getOrderName())
+                            .trackCode(order.getTrackCode())
+                            .build()
+            );
         }
         return orders;
     }
@@ -63,7 +72,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void updateOrderStatus(Order order, Status status){
+    public void updateOrderStatus(Order order, Status status) {
         log.info("IN addStatus - orderId: {}, statusId: {}", order.getId(), status.getId());
         OrderStatus orderStatus = new OrderStatus();
         orderStatus.setStatus(status);
@@ -74,8 +83,56 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderViewDTO getOrder(String trackCode) {
+    public OrderDetailDTO getOrder(String trackCode, String language) {
         Order order = orderRepository.findByTrackCode(trackCode).orElseThrow(() -> new NotFoundException("order not found"));
-        return new OrderViewDTO(order);
+        log.info("IN getOrder {} {}", trackCode, language);
+        OrderDetailDTO orderViewDTO = OrderDetailDTO.builder()
+                .id(order.getId())
+                .orderName(order.getOrderName())
+                .trackCode(order.getTrackCode())
+                .statusList(statusConverter(order.getOrderStatuses(), language))
+                .build();
+
+        return orderViewDTO;
+    }
+
+    private List<String> statusConverter(List<OrderStatus> orderStatuses, String language) {
+//        TODO:
+        List<String> statuses = new ArrayList<>();
+        log.info(orderStatuses.size());
+        for (OrderStatus orderStatus : orderStatuses) {
+            Status status = orderStatus.getStatus();
+            log.info("status {}", status);
+            Language statusLanguage = status.getLanguage();
+            log.info(statusLanguage.getChinese());
+            log.info(statusLanguage.getEnglish());
+            log.info(statusLanguage.getRussian());
+            log.info(statusLanguage.getKazakh());
+//            String acceptLanguage = switch (language) {
+//                case "en" -> statusLanguage.getEnglish();
+//                case "kk" -> statusLanguage.getKazakh();
+//                case "ru" -> statusLanguage.getRussian();
+//                case "cn" -> statusLanguage.getChinese();
+//                default -> throw new IllegalStateException("Unexpected value: " + language);
+//            };
+            if (language.equals("en")) {
+                statuses.add(statusLanguage.getEnglish());
+            } else if(language.equals("ru")) {
+                statuses.add(statusLanguage.getRussian());
+            } else if(language.equals("cn")) {
+                statuses.add(statusLanguage.getChinese());
+            } else {
+                statuses.add(statusLanguage.getKazakh());
+            }
+
+
+        }
+
+        return statuses;
+    }
+
+    @Transactional
+    public Order saveOrder(Order order) {
+        return orderRepository.save(order);
     }
 }

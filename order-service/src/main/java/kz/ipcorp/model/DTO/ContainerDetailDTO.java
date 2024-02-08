@@ -17,11 +17,19 @@ public class ContainerDetailDTO {
     private String name;
     private List<OrderViewDTO> orders = new ArrayList<>();
 
+    public ContainerDetailDTO() {}
+
     public ContainerDetailDTO(Container container) {
         this.id = container.getId();
         this.name = container.getName();
         for (Order order : container.getOrders()) {
-            orders.add(new OrderViewDTO(order));
+            orders.add(
+                    OrderViewDTO.builder().
+                            id(order.getId())
+                            .orderName(order.getOrderName())
+                            .trackCode(order.getTrackCode())
+                            .build()
+            );
         }
     }
 }
