@@ -130,7 +130,7 @@ services:
       - 'POSTGRES_DB=ipcorp-order'
       - 'POSTGRES_PASSWORD=123'
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     expose:
       - "5432"
     command: -p 5432
@@ -146,7 +146,7 @@ services:
       - 'POSTGRES_PASSWORD=123'
       - 'POSTGRES_DB=ipcorp-market'
     ports:
-      - "5435:5435"
+      - "127.0.0.1:5435:5435"
     expose:
       - "5435"
     command: -p 5435
@@ -165,7 +165,7 @@ services:
       - 'POSTGRES_DB=ipcorp-auth'
       - 'POSTGRES_PASSWORD=123'
     ports:
-      - "5434:5434"
+      - "127.0.0.1:5434:5434"
     expose:
       - "5434"
     command: -p 5434
