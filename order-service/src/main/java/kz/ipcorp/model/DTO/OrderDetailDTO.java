@@ -17,5 +17,4 @@ public class OrderDetailDTO {
     private String trackCode;
     private String orderName;
     private List<Map<String, String>> statusList;
-    private LocalDateTime time;
 }

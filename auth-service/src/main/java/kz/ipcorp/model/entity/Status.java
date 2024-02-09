@@ -16,7 +16,7 @@ public class Status {
 
 
     @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "language_id")
+    @JoinColumn(name = "language_id", referencedColumnName = "id")
     private Language language;
 
 }

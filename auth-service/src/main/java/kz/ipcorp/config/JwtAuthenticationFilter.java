@@ -9,6 +9,8 @@ import kz.ipcorp.service.JWTService;
 import kz.ipcorp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -27,6 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JWTService jwtService;
     private final UserService userService;
+    private final Logger log = LogManager.getLogger(JwtAuthenticationFilter.class);
+
 
     static {
         System.out.println("JwtAuthenticationFilter");
@@ -37,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
         String token;
+        log.info("uri {}", request.getRequestURI());
 
         if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, "Bearer ")) {
             filterChain.doFilter(request, response);
@@ -44,8 +49,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         token = authHeader.substring(7);
+        log.info("token: {}",token);
         String userId = jwtService.extractID(token);
-
+        log.info("userId: {}", userId);
         if (StringUtils.isNotEmpty(userId) && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userService.findById(UUID.fromString(userId));
             if (jwtService.isTokenExpired(token)) {

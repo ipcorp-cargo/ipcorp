@@ -25,4 +25,16 @@ public class Language {
 
     @Column(name = "chinese")
     private String chinese;
+
+    @Column(name = "description_kazakh")
+    private String descriptionKazakh;
+
+    @Column(name = "description_english")
+    private String descriptionEnglish;
+
+    @Column(name = "description_russian")
+    private String descriptionRussian;
+
+    @Column(name = "description_chinese")
+    private String descriptionChinese;
 }

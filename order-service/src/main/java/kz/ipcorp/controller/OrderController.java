@@ -28,9 +28,10 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderViewDTO>> getOrders(@RequestHeader(value = "userId", required = false) String userId) {
+    public ResponseEntity<List<OrderDetailDTO>> getOrders(@RequestHeader(value = "userId", required = false) String userId,
+                                                          @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
         log.info("IN getOrders - userId: {}", userId);
-        return new ResponseEntity<>(orderService.getOrders(userId), HttpStatus.OK);
+        return new ResponseEntity<>(orderService.getOrders(userId, language), HttpStatus.OK);
     }
 
 

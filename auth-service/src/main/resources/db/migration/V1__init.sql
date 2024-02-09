@@ -4,7 +4,11 @@ CREATE TABLE IF NOT EXISTS languages
     kazakh  VARCHAR(255),
     english VARCHAR(255),
     russian VARCHAR(255),
-    chinese VARCHAR(255)
+    chinese VARCHAR(255),
+    description_kazakh VARCHAR(255),
+    description_english VARCHAR(255),
+    description_russian VARCHAR(255),
+    description_chinese VARCHAR(255)
 );
 CREATE TABLE IF NOT EXISTS statuses
 (
@@ -40,23 +44,36 @@ CREATE TABLE IF NOT EXISTS verification
 
 
 
-INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (1, null, 'Order received', null, null);
+INSERT INTO languages(id, kazakh, english, russian, chinese,
+                      description_kazakh, description_english,description_russian, description_chinese)
+VALUES (1, 'kazakh', 'Order received', 'kazakh', 'chinese',
+        'desc kazakh', 'desc english', 'desc russian', 'desc chinese');
 
-INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (2, null, 'Shipped from the warehouse', null, null);
+INSERT INTO languages(id, kazakh, english, russian, chinese,
+                      description_kazakh, description_english,description_russian, description_chinese)
+VALUES (2, 'kazakh', 'Shipped from the warehouse', 'english', 'chinese',
+        'desc kazakh', 'desc english', 'desc russian', 'desc chinese');
 
-INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (3, null, 'Under customs clearance', null, null);
 
-INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (4, null, 'In Almaty sorting point', null, null);
+INSERT INTO languages(id, kazakh, english, russian, chinese,
+                      description_kazakh, description_english,description_russian, description_chinese)
+VALUES (3, 'kazakh', 'Under customs clearance', 'russian', 'chinese',
+        'desc kazakh', 'desc english', 'desc russian', 'desc chinese');
 
-INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (5, null, 'Ready to pick up', null, null);
+INSERT INTO languages(id, kazakh, english, russian, chinese,
+                      description_kazakh, description_english,description_russian, description_chinese)
+VALUES (4, 'kazakh', 'In Almaty sorting point', 'russian', 'chinese',
+        'desc kazakh', 'desc english', 'desc russian', 'desc chinese');
 
-INSERT INTO languages(id, kazakh, english, russian, chinese)
-VALUES (6, null, 'Delivered', null, null);
+INSERT INTO languages(id, kazakh, english, russian, chinese,
+                      description_kazakh, description_english,description_russian, description_chinese)
+VALUES (5, 'kazakh', 'Ready to pick up', 'russian', 'chinese',
+        'desc kazakh', 'desc english', 'desc russian', 'desc chinese');
+
+INSERT INTO languages(id, kazakh, english, russian, chinese,
+                      description_kazakh, description_english,description_russian, description_chinese)
+VALUES (6, 'kazakh', 'Delivered', 'russian', 'chinese',
+        'desc kazakh', 'desc english', 'desc russian', 'desc chinese');
 
 
 

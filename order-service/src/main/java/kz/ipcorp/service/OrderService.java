@@ -45,16 +45,17 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderViewDTO> getOrders(String userId) {
+    public List<OrderDetailDTO> getOrders(String userId, String language) {
         log.info("IN getOrders - userId: {}", userId);
         List<Order> ordersList = orderRepository.findAllByUserId(UUID.fromString(userId));
-        List<OrderViewDTO> orders = new ArrayList<>();
+        List<OrderDetailDTO> orders = new ArrayList<>();
         for (Order order : ordersList) {
             orders.add(
-                    OrderViewDTO.builder()
+                    OrderDetailDTO.builder()
                             .id(order.getId())
                             .orderName(order.getOrderName())
                             .trackCode(order.getTrackCode())
+                            .statusList(statusConverter(order.getOrderStatuses(), language))
                             .build()
             );
         }
@@ -88,14 +89,11 @@ public class OrderService {
         log.info("IN getOrder {} {}", trackCode, language);
         Order order = orderRepository.findByTrackCode(trackCode).orElseThrow(
                 () -> new NotFoundException("order not found"));
-        for (OrderStatus orderStatus : order.getOrderStatuses()) {
-            log.info("orderStatus: {}", orderStatus.getStatus().getId());
-        }
+
         return OrderDetailDTO.builder()
                 .id(order.getId())
                 .orderName(order.getOrderName())
                 .trackCode(order.getTrackCode())
-                .time(LocalDateTime.now())
                 .statusList(statusConverter(order.getOrderStatuses(), language))
                 .build();
     }
@@ -112,7 +110,7 @@ public class OrderService {
                         "status" , statusLanguage.getEnglish(),
                         "time" , orderStatus.getCreatedAt().toString()
                 ));
-                case "kz" -> statuses.add(Map.of(
+                case "kk" -> statuses.add(Map.of(
                         "status" , statusLanguage.getKazakh(),
                         "time" , orderStatus.getCreatedAt().toString()
                 ));

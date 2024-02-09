@@ -1,10 +1,16 @@
 package kz.ipcorp.config;
 
+import kz.ipcorp.controller.AuthController;
 import kz.ipcorp.model.enumuration.Role;
 import kz.ipcorp.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -28,24 +34,29 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
+    private final Logger log = LogManager.getLogger(SecurityConfig.class);
+
 
     static {
         System.out.println("SecurityConfig");
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        log.info("aaa");
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> {
-                    request.requestMatchers("/api/auth/**").permitAll()
+                    request
+                            .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/api/sms/**").permitAll()
                             .requestMatchers("/api/mail/**").permitAll()
                             .requestMatchers("/swagger-ui/**").permitAll()
                             .requestMatchers("/v3/api-docs/**").permitAll()
                             .requestMatchers("/swagger-resources/*").permitAll()
-                            .requestMatchers("/api/admin").hasAnyAuthority(Role.ADMIN.name())
+                            .requestMatchers("/api/admin").hasAnyAuthority(Role.ADMIN.name(
+
+                            ))
                             .requestMatchers("/api/user").hasAnyAuthority(Role.USER.name())
                             .anyRequest().permitAll();
                 })

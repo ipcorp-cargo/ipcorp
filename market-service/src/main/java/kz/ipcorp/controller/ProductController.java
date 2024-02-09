@@ -47,4 +47,12 @@ public class ProductController {
         productService.saveImagePath(productId, path);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<HttpStatus> deleteProduct(Principal principal,
+                                                    @RequestHeader(name = "userId", required = false) UUID adminId,
+                                                    @PathVariable("productId") UUID productId) {
+        productService.deleteProduct(UUID.fromString(principal.getName()), adminId, productId);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 }

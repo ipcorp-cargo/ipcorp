@@ -15,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -23,11 +26,6 @@ public class AuthController {
     private final AuthenticationService authenticationService;
     private final Logger log = LogManager.getLogger(AuthController.class);
 
-    /**TODO:
-     * SignUpRequestDTO(phoneNumber, password, verificationCode)
-     *
-     *
-     * */
     @PostMapping("/signup")
     public ResponseEntity<HttpStatus> signUp(@RequestBody SignUpRequestDTO signUpRequestDTO) {
         authenticationService.createUser(signUpRequestDTO);
@@ -53,5 +51,12 @@ public class AuthController {
     public ResponseEntity<Void> resetPassword(@RequestBody SignUpRequestDTO signUpRequestDTO){
         authenticationService.resetPassword(signUpRequestDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<HttpStatus> deleteUser(@RequestHeader("userId") UUID userId) {
+        log.info("delete with id {}", userId);
+        authenticationService.deleteUser(userId);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

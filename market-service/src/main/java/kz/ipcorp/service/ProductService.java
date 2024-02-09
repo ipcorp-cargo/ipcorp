@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -105,5 +106,41 @@ public class ProductService {
 
         product.getImagePaths().add(path);
         productRepository.save(product);
+    }
+
+    @Transactional
+    public void deleteProduct(UUID sellerId, UUID adminId, UUID productId) {
+        boolean isDeletedWithSeller = deleteProductOwnerSeller(sellerId, productId);
+        boolean isDeletedWithAdmin = deleteProductWithAdmin(adminId, productId);
+        if (!isDeletedWithSeller && !isDeletedWithAdmin) {
+            throw new NotConfirmedException("you can not delete order. Only owner product or admin can access");
+        }
+    }
+
+    private boolean deleteProductWithAdmin(UUID adminId, UUID productId) {
+//        TODO: admin can delete product if he has role admin
+        return false;
+    }
+
+    private boolean deleteProductOwnerSeller(UUID sellerId, UUID productId) {
+        Optional<Seller> seller = sellerService.findById(sellerId);
+        if(sellerId == null || seller.isEmpty()) {
+            return false;
+        } else {
+            Seller owner = seller.get();
+
+            Optional<Product> optionalProduct = productRepository.findById(productId);
+
+            if (optionalProduct.isEmpty()) {
+                throw new NotFoundException(String.format("product with id %s not found", productId));
+            } else {
+                Product product = optionalProduct.get();
+                if (product.getCompany().getSeller().getId().equals(owner.getId())) {
+//                    TODO: есть уязвимость что в жаве классе останеться product
+                    productRepository.deleteById(productId);
+                }
+            }
+            return true;
+        }
     }
 }

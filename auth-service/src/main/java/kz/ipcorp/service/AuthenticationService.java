@@ -1,9 +1,6 @@
 package kz.ipcorp.service;
 
-import kz.ipcorp.exception.AuthenticationException;
-import kz.ipcorp.exception.DuplicateEntityException;
-import kz.ipcorp.exception.NotFoundException;
-import kz.ipcorp.exception.UserInputException;
+import kz.ipcorp.exception.*;
 import kz.ipcorp.model.DTO.AccessTokenRequestDTO;
 import kz.ipcorp.model.DTO.SignInRequestDTO;
 import kz.ipcorp.model.DTO.SignUpRequestDTO;
@@ -118,4 +115,14 @@ public class AuthenticationService {
         verificationService.invalidateVerificationCode(phoneNumber);
     }
 
+    @Transactional
+    public void deleteUser(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException(String.format("user with id %s not found", userId))
+        );
+        if (user.getRole() == Role.ADMIN) {
+            throw new NotConfirmedException("admin can not delete account");
+        }
+        userRepository.delete(user);
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,6 +25,10 @@ public class SellerService {
         Seller seller = sellerRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("seller with id %s not found", id)));
         log.info("IN getById - id: {}", id.toString());
         return seller;
+    }
+
+    public Optional<Seller> findById(UUID id) {
+        return sellerRepository.findById(id);
     }
 
 
