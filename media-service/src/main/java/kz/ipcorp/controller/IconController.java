@@ -14,7 +14,7 @@ import java.io.IOException;
 @RequestMapping("api/icons")
 public class IconController {
 
-    @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String addIcon(@RequestPart("icon") MultipartFile icon) throws IOException {
         final String subFolder = "/icon";
         String hashStringIcon = FileManager.hashFile(icon.getInputStream());
@@ -24,7 +24,7 @@ public class IconController {
                 hashStringIcon.substring(2));
     }
 
-    @GetMapping("/download")
+    @GetMapping
     ResponseEntity<byte[]> getIcon(@RequestParam("iconPath") String iconPath) throws IOException {
         return new ResponseEntity<>(FileManager.getFile(iconPath), HttpStatus.OK);
     }

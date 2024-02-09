@@ -1,37 +1,30 @@
 package kz.ipcorp.controller;
 
 import kz.ipcorp.util.FileManager;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
-@RequestMapping("api/product")
+@RequestMapping("api/products")
 public class ImageController {
 
-    @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String addImage(@RequestPart("images") MultipartFile image) throws IOException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public String addImage(@RequestPart("image") MultipartFile image) throws IOException {
         final String subFolder = "/image";
         String hashStringIcon = FileManager.hashFile(image.getInputStream());
-        String path = FileManager.saveFile(
+        return FileManager.saveFile(
                 image.getInputStream(),
                 subFolder.concat("/".concat(hashStringIcon.substring(0, 2))),
                 hashStringIcon.substring(2));
-        return path;
     }
 
-    @GetMapping("/download")
-    public List<byte[]> getImage(@RequestParam("paths") List<String> paths) throws IOException {
-        List<byte[]> images = new ArrayList<>();
-        for (String path : paths) {
-            images.add(
-                    FileManager.getFile(path)
-            );
-        }
-        return images;
+    @GetMapping
+    ResponseEntity<byte[]> getImage(@RequestParam("imagePath") String imagePath) throws IOException {
+        return new ResponseEntity<>(FileManager.getFile(imagePath), HttpStatus.OK);
     }
 }

@@ -1,7 +1,6 @@
 package kz.ipcorp.controller;
 
 import kz.ipcorp.util.FileManager;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,7 @@ import java.io.IOException;
 @RequestMapping("api/licenses")
 public class LicenseController {
 
-    @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String addLicense(@RequestPart("license") MultipartFile license) throws IOException {
         final String subFolder = "/license";
         String hashStringLicense = FileManager.hashFile(license.getInputStream());
@@ -24,7 +23,7 @@ public class LicenseController {
                 hashStringLicense.substring(2));
     }
 
-    @GetMapping("/download")
+    @GetMapping
     ResponseEntity<byte[]> getLicense(@RequestParam("licensePath") String licensePath) throws IOException {
         return new ResponseEntity<>(FileManager.getFile(licensePath), HttpStatus.OK);
     }
