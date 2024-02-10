@@ -10,6 +10,8 @@ import kz.ipcorp.repository.OrderStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,9 +47,9 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderDetailDTO> getOrders(String userId, String language) {
+    public List<OrderDetailDTO> getOrders(String userId, String language, Pageable pageable) {
         log.info("IN getOrders - userId: {}", userId);
-        List<Order> ordersList = orderRepository.findAllByUserId(UUID.fromString(userId));
+        Page<Order> ordersList = orderRepository.findAllByUserId(UUID.fromString(userId), pageable);
         List<OrderDetailDTO> orders = new ArrayList<>();
         for (Order order : ordersList) {
             orders.add(
@@ -118,7 +120,7 @@ public class OrderService {
                         "status" , statusLanguage.getRussian(),
                         "time" , orderStatus.getCreatedAt().toString()
                 ));
-                case "ch" -> statuses.add(Map.of(
+                case "cn" -> statuses.add(Map.of(
                         "status" , statusLanguage.getChinese(),
                         "time" , orderStatus.getCreatedAt().toString()
                 ));

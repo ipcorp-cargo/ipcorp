@@ -7,6 +7,7 @@ import kz.ipcorp.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +30,11 @@ public class OrderController {
 
     @GetMapping
     public ResponseEntity<List<OrderDetailDTO>> getOrders(@RequestHeader(value = "userId", required = false) String userId,
-                                                          @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
+                                                          @CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
+                                                          @RequestParam(value = "page", defaultValue = "0") int page,
+                                                          @RequestParam(value = "size", defaultValue = "10") int size) {
         log.info("IN getOrders - userId: {}", userId);
-        return new ResponseEntity<>(orderService.getOrders(userId, language), HttpStatus.OK);
+        return new ResponseEntity<>(orderService.getOrders(userId, language, PageRequest.of(page, size)), HttpStatus.OK);
     }
 
 

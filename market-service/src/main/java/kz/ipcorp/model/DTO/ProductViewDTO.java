@@ -23,15 +23,20 @@ public class ProductViewDTO {
     public ProductViewDTO() {
     }
 
-    public ProductViewDTO(Product product) {
+    public ProductViewDTO(Product product, String language) {
         this.id = product.getId();
         this.name = product.getName();
         this.price = product.getPrice();
         this.description = product.getDescription();
         this.imagePaths = new ArrayList<>(product.getImagePaths());
         if (product.getCategory() != null) {
-//            TODO: do conca
-            this.categoryName = product.getCategory().getLanguage().getEnglish();
+            switch (language){
+                case "ru" -> this.categoryName = product.getCategory().getLanguage().getRussian();
+                case "kk" -> this.categoryName = product.getCategory().getLanguage().getKazakh();
+                case "en" -> this.categoryName = product.getCategory().getLanguage().getEnglish();
+                case "cn" -> this.categoryName = product.getCategory().getLanguage().getChinese();
+                default -> throw new IllegalStateException("Unexpected value: " + language);
+            }
         }
     }
 }

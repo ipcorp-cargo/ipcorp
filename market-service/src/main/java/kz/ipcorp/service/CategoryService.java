@@ -9,7 +9,10 @@ import kz.ipcorp.model.entity.Category;
 import kz.ipcorp.model.entity.Language;
 import kz.ipcorp.model.entity.Product;
 import kz.ipcorp.repository.CategoryRepository;
+import kz.ipcorp.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ import java.util.UUID;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
     private final LanguageService languageService;
 
     @Transactional(readOnly = true)
@@ -82,14 +86,10 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductViewDTO> getProducts(UUID categoryId) {
+    public List<ProductViewDTO> getProducts(UUID categoryId, String language, Pageable pageable) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new NotFoundException("category not found"));
 
-        List<ProductViewDTO> productViewDTOS = new ArrayList<>();
-        for (Product product : category.getProducts()) {
-            productViewDTOS.add(new ProductViewDTO(product));
-        }
-
-        return productViewDTOS;
+        Page<Product> productPage = productRepository.findByCategory(category, pageable);
+        return productPage.map((product -> new ProductViewDTO(product, language))).getContent();
     }
 }

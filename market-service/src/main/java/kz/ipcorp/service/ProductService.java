@@ -14,6 +14,9 @@ import kz.ipcorp.repository.ProductRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,27 +64,20 @@ public class ProductService {
         return product.getId();
     }
     @Transactional(readOnly = true)
-    public List<ProductViewDTO> getAllProducts(){
-        List<ProductViewDTO> productViewDTOS = new ArrayList<>();
-        for (Product product : productRepository.findAll()){
-            productViewDTOS.add(new ProductViewDTO(product));
-        }
-        return productViewDTOS;
+    public List<ProductViewDTO> getAllProducts(String language, Pageable pageable){
+        Page<Product> productPage = productRepository.findAll(pageable);
+        return productPage.map((product -> new ProductViewDTO(product, language))).getContent();
     }
 
     @Transactional(readOnly = true)
-    public List<ProductViewDTO> getProducts(UUID sellerId) {
+    public List<ProductViewDTO> getProducts(UUID sellerId, String language, Pageable pageable) {
         Seller seller = sellerService.getById(sellerId);
         Company company = seller.getCompany();
 
         checkCompanyStatus(company);
 
-        List<ProductViewDTO> products = new ArrayList<>();
-        for (Product product : company.getProducts()) {
-            products.add(new ProductViewDTO(product));
-        }
-
-        return products;
+        Page<Product> productPage = productRepository.findByCompany(company, pageable);
+        return productPage.map((product -> new ProductViewDTO(product, language))).getContent();
     }
 
     private void checkCompanyStatus(Company company) {

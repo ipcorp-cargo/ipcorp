@@ -3,8 +3,11 @@ package kz.ipcorp.controller;
 import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.ProductSaveDTO;
 import kz.ipcorp.model.DTO.ProductViewDTO;
+import kz.ipcorp.model.entity.Product;
 import kz.ipcorp.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +36,14 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductViewDTO>> getProducts(Principal principal) {
+    public ResponseEntity<List<ProductViewDTO>> getProducts(@CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
+                                     @RequestParam(value = "page", defaultValue = "0") int page,
+                                     @RequestParam(value = "size", defaultValue = "10") int size,
+                                     Principal principal) {
         if (principal != null) {
-            return new ResponseEntity<>(productService.getProducts(UUID.fromString(principal.getName())), HttpStatus.OK);
+            return new ResponseEntity<>(productService.getProducts(UUID.fromString(principal.getName()), language, PageRequest.of(page, size)), HttpStatus.OK);
         }
-        return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
+        return new ResponseEntity<>(productService.getAllProducts(language, PageRequest.of(page, size)), HttpStatus.OK);
     }
 
     @PostMapping(path = "/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -2,16 +2,15 @@ package kz.ipcorp.controller;
 
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import jakarta.ws.rs.Path;
 import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.CategoryCreateDTO;
 import kz.ipcorp.model.DTO.CategoryViewDTO;
 import kz.ipcorp.model.DTO.ProductViewDTO;
 import kz.ipcorp.service.CategoryService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,8 +48,11 @@ public class CategoryController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/{categoryId}")
-    public ResponseEntity<List<ProductViewDTO>> getProducts(@PathVariable("categoryId") UUID categoryId) {
-        return ResponseEntity.ok(categoryService.getProducts(categoryId));
+    @GetMapping("/filter")
+    public ResponseEntity<List<ProductViewDTO>> getProducts(@CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
+                                                            @RequestParam("categoryId") UUID categoryId,
+                                                            @RequestParam(value = "page", defaultValue = "0") int page,
+                                                            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return ResponseEntity.ok(categoryService.getProducts(categoryId, language, PageRequest.of(page, size)));
     }
 }
