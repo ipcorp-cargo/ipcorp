@@ -24,7 +24,7 @@ public class ImageController {
     }
 
     @GetMapping
-    ResponseEntity<byte[]> getImage(@RequestParam("imagePath") String imagePath) throws IOException {
+    public ResponseEntity<byte[]> getImage(@RequestParam("imagePath") String imagePath) throws IOException {
         return new ResponseEntity<>(FileManager.getFile(imagePath), HttpStatus.OK);
     }
 }

@@ -24,7 +24,7 @@ public class LicenseController {
     }
 
     @GetMapping
-    ResponseEntity<byte[]> getLicense(@RequestParam("licensePath") String licensePath) throws IOException {
+    public ResponseEntity<byte[]> getLicense(@RequestParam("licensePath") String licensePath) throws IOException {
         return new ResponseEntity<>(FileManager.getFile(licensePath), HttpStatus.OK);
     }
 }

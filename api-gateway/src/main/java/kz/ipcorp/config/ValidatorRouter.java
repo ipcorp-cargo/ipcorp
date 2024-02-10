@@ -12,6 +12,7 @@ public class ValidatorRouter {
     private static final List<String> OPEN_API_ENDPOINTS = List.of(
             "/api/auth/signup",
             "/api/auth/signin",
+            "/api/auth/access-token",
             "/v3/api-docs",
             "/swagger-ui/index.html",
             "/api/products",

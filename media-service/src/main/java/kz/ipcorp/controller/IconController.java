@@ -11,7 +11,7 @@ import kz.ipcorp.util.FileManager;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("api/icons")
+@RequestMapping("/api/icons")
 public class IconController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -25,7 +25,7 @@ public class IconController {
     }
 
     @GetMapping
-    ResponseEntity<byte[]> getIcon(@RequestParam("iconPath") String iconPath) throws IOException {
+    public ResponseEntity<byte[]> getIcon(@RequestParam("iconPath") String iconPath) throws IOException {
         return new ResponseEntity<>(FileManager.getFile(iconPath), HttpStatus.OK);
     }
 }

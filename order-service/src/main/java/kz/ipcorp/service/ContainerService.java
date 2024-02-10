@@ -30,12 +30,7 @@ public class ContainerService {
     @Transactional
     public ContainerReadDTO createContainer(ContainerCreateDTO createDTO) {
         log.info("IN createContainer - containerName: {}", createDTO.getName());
-        boolean isContainerExists = containerRepository.existsByName(createDTO.getName());
-        if (isContainerExists) {
-            throw new DuplicatedEntityException(
-                    String.format("container with name: %s already exists", createDTO.getName()
-                    ));
-        }
+
         Container container = new Container();
         container.setName(createDTO.getName());
         container.setOrders(new ArrayList<>());

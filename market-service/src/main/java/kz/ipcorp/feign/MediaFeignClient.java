@@ -11,12 +11,12 @@ import java.util.List;
 
 @FeignClient(name = "media-service", configuration = FeignSupportConfig.class)
 public interface MediaFeignClient {
-    @PostMapping(path = "api/licenses/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "api/licenses", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     String getPathName(@RequestPart("license") MultipartFile license);
 
-    @PostMapping(path = "api/product/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    String getPath(@RequestPart("images") MultipartFile images);
+    @PostMapping(path = "api/products", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    String getPath(@RequestPart("image") MultipartFile image);
 
-    @PostMapping(path = "api/icons/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "api/icons", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     String getPathCategoryIcon(@RequestPart("icon") MultipartFile icon);
 }

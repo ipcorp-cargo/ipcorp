@@ -30,7 +30,8 @@ public class ProductViewDTO {
         this.description = product.getDescription();
         this.imagePaths = new ArrayList<>(product.getImagePaths());
         if (product.getCategory() != null) {
-            this.categoryName = product.getCategory().getName();
+//            TODO: do conca
+            this.categoryName = product.getCategory().getLanguage().getEnglish();
         }
     }
 }

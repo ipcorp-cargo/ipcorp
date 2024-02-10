@@ -1,6 +1,7 @@
 package kz.ipcorp.controller;
 
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.ws.rs.Path;
 import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.CategoryCreateDTO;
@@ -30,19 +31,22 @@ public class CategoryController {
 
 
     @GetMapping
-    public ResponseEntity<List<CategoryViewDTO>> getCategories() {
-        return ResponseEntity.ok(categoryService.getCategories());
+    public ResponseEntity<List<CategoryViewDTO>> getCategories(@CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
+
+        return ResponseEntity.ok(categoryService.getCategories(language));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CategoryViewDTO> createCategory(@ModelAttribute CategoryCreateDTO categoryCreateDTO) {
+    @RequestBody(description = "nameKazakh, nameRussian, ... -> null bolmau kerek!!!")
+    public ResponseEntity<HttpStatus> createCategory(@ModelAttribute CategoryCreateDTO categoryCreateDTO) {
         log.info("createCategory");
         String iconPath = mediaFeignClient.getPathCategoryIcon(categoryCreateDTO.getIconPath());
         System.out.println("============================");
         System.out.println(iconPath);
         System.out.println("============================");
         log.info("iconPath {}", iconPath);
-        return new ResponseEntity<>(categoryService.saveCategory(categoryCreateDTO, iconPath), HttpStatus.CREATED);
+        categoryService.saveCategory(categoryCreateDTO, iconPath);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/{categoryId}")

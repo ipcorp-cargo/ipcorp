@@ -18,11 +18,12 @@ public class Category {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "name")
-    private String name;
-
     @Column(name = "icon_path")
     private String iconPath;
+
+    @OneToOne
+    @JoinColumn(name = "language_id", referencedColumnName = "id")
+    private Language language;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
