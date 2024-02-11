@@ -129,4 +129,11 @@ public class OrderService {
         }
         return statuses;
     }
+
+    @Transactional
+    public Order saveOrder(String trackCode) {
+        Order order = new Order();
+        order.setTrackCode(trackCode);
+        return orderRepository.save(order);
+    }
 }

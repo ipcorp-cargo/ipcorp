@@ -45,9 +45,8 @@ public class ContainerService {
         Container container = containerRepository.findById(containerId)
                 .orElseThrow(() -> new NotFoundException(String.format("container with containerId %s not found", containerId)));
         Order order = orderService.getByTrackCode(trackCode).
-                orElseThrow(() -> new NotFoundException(String.format("order with track code %s not found", trackCode)));
+                orElse(orderService.saveOrder(trackCode));
         container.getOrders().add(order);
-
         Container savedContainer = containerRepository.saveAndFlush(container);
         orderService.addContainer(order, savedContainer);
         return new ContainerReadDTO(container);
