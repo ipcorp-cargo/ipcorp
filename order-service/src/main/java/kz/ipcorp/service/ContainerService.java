@@ -1,6 +1,7 @@
 package kz.ipcorp.service;
 
 import kz.ipcorp.exception.DuplicatedEntityException;
+import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.model.entity.Container;
@@ -100,5 +101,18 @@ public class ContainerService {
         } catch (Exception e) {
             throw new NotFoundException("container or order not found, order is not in this container");
         }
+    }
+
+    @Transactional
+    public void deleteContainer(UUID containerId) {
+        Container container = containerRepository.findById(containerId).orElseThrow(() ->
+                new NotFoundException("container not found"));
+
+        if (!container.getOrders().isEmpty()) {
+            throw new NotConfirmedException("container is not empty");
+        }
+
+        containerRepository.delete(container);
+
     }
 }

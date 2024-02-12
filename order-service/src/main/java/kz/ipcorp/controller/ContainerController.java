@@ -1,5 +1,6 @@
 package kz.ipcorp.controller;
 
+import jakarta.ws.rs.Path;
 import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.service.ContainerService;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +65,13 @@ public class ContainerController {
     public ResponseEntity<HttpStatus> deleteOrderFromContainer(@PathVariable("containerId") UUID containerId,
                                                                @PathVariable("orderId") UUID orderId) {
         containerService.deleteOrderFromContainer(containerId, orderId);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+
+    @DeleteMapping("/{containerId}")
+    public ResponseEntity<HttpStatus> deleteContainer(@PathVariable("containerId") UUID containerId) {
+        containerService.deleteContainer(containerId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
