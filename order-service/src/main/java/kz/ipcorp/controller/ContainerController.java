@@ -60,9 +60,10 @@ public class ContainerController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @DeleteMapping
-    public ResponseEntity<HttpStatus> deleteOrderFromContainer(ContainerOrderDeleteDTO containerOrderDeleteDTO) {
-        containerService.deleteOrderFromContainer(containerOrderDeleteDTO.getContainerId(), containerOrderDeleteDTO.getOrderId());
+    @DeleteMapping("/{containerId}/{orderId}")
+    public ResponseEntity<HttpStatus> deleteOrderFromContainer(@PathVariable("containerId") UUID containerId,
+                                                               @PathVariable("orderId") UUID orderId) {
+        containerService.deleteOrderFromContainer(containerId, orderId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 

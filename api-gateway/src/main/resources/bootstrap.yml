@@ -1,18 +1,18 @@
-spring:
-  cloud:
-    gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins:
-              - "https://ipcorpn.com"
-              - "https://api.ipcorpn.com"
-            allowedMethods:
-              - GET
-              - POST
-              - DELETE
-              - PUT
-              - PATCH
+#spring:
+#  cloud:
+#    gateway:
+#      globalcors:
+#        cors-configurations:
+#          '[/**]':
+#            allowedOrigins:
+#              - "https://ipcorpn.com"
+#              - "https://api.ipcorpn.com"
+#            allowedMethods:
+#              - GET
+#              - POST
+#              - DELETE
+#              - PUT
+#              - PATCH
 springdoc:
   webjars:
     prefix: /api
