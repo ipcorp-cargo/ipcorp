@@ -1,5 +1,6 @@
 package kz.ipcorp.controller;
 
+import jakarta.ws.rs.Path;
 import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.ProductSaveDTO;
 import kz.ipcorp.model.DTO.ProductViewDTO;
@@ -44,6 +45,12 @@ public class ProductController {
             return new ResponseEntity<>(productService.getProducts(UUID.fromString(principal.getName()), language, PageRequest.of(page, size)), HttpStatus.OK);
         }
         return new ResponseEntity<>(productService.getAllProducts(language, PageRequest.of(page, size)), HttpStatus.OK);
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<ProductViewDTO> getProduct(@PathVariable("productId") UUID productId,
+            @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
+        return ResponseEntity.ok(productService.getProduct(productId, language));
     }
 
     @PostMapping(path = "/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

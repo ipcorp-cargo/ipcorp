@@ -147,4 +147,12 @@ public class ProductService {
         Page<Product> productPage = productRepository.findByCategory(category, pageable);
         return productPage.map((product -> new ProductViewDTO(product, language))).getContent();
     }
+
+
+    @Transactional
+    public ProductViewDTO getProduct(UUID productId, String language) {
+        Product product = productRepository.findById(productId).orElseThrow(() ->
+                new NotFoundException("product not found"));
+        return new ProductViewDTO(product, language);
+    }
 }
