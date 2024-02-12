@@ -64,7 +64,7 @@ public class CompanyService {
         company.setName(companyCreateDTO.getName());
         company.setRegistrationAddress(companyCreateDTO.getRegistrationAddress());
         company.setBusinessActivity(companyCreateDTO.getBusinessActivity());
-        company.setRegistrationNumber(company.getRegistrationNumber());
+        company.setRegistrationNumber(companyCreateDTO.getRegistrationNumber());
         company.setSeller(seller);
         Company savedCompany = companyRepository.save(company);
         seller.setCompany(savedCompany);

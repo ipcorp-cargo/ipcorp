@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -109,12 +108,15 @@ public class ProductService {
         boolean isDeletedWithSeller = deleteProductOwnerSeller(sellerId, productId);
         boolean isDeletedWithAdmin = deleteProductWithAdmin(adminId, productId);
         if (!isDeletedWithSeller && !isDeletedWithAdmin) {
-            throw new NotConfirmedException("you can not delete order. Only owner product or admin can access");
+            throw new NotConfirmedException("you can not delete order. Only owner product can access");
         }
     }
 
     private boolean deleteProductWithAdmin(UUID adminId, UUID productId) {
 //        TODO: admin can delete product if he has role admin
+//        if(adminId != null) {
+//            throw new NotConfirmedException("poka tolko seller delete jasai aladi");
+//        }
         return false;
     }
 
@@ -138,5 +140,11 @@ public class ProductService {
             }
             return true;
         }
+    }
+    @Transactional(readOnly = true)
+    public List<ProductViewDTO> getProductsByCategory(UUID categoryId, String language, PageRequest pageable) {
+        Category category = categoryService.findById(categoryId);
+        Page<Product> productPage = productRepository.findByCategory(category, pageable);
+        return productPage.map((product -> new ProductViewDTO(product, language))).getContent();
     }
 }

@@ -53,4 +53,21 @@ public class ProductController {
         productService.saveImagePath(productId, path);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<ProductViewDTO>> getProductsByCategory(
+            @RequestParam("categoryId") UUID categoryId,
+            @CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(productService.getProductsByCategory(categoryId, language, PageRequest.of(page, size)));
+    }
+
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<HttpStatus> deleteOrder(@PathVariable("productId") UUID productId,
+                                                  Principal principal) {
+        productService.deleteProduct(UUID.fromString(principal.getName()), null, productId);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 }

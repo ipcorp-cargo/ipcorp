@@ -92,4 +92,14 @@ public class CategoryService {
         Page<Product> productPage = productRepository.findByCategory(category, pageable);
         return productPage.map((product -> new ProductViewDTO(product, language))).getContent();
     }
+
+    @Transactional(readOnly = true)
+    public CategoryViewDTO getCategory(UUID categoryId, String language) {
+        Category category = findById(categoryId);
+        return CategoryViewDTO.builder()
+                .id(category.getId())
+                .iconPath(category.getIconPath())
+                .name(convertLanguage(category.getLanguage(), language))
+                .build();
+    }
 }

@@ -19,6 +19,8 @@ public class ValidatorRouter {
             "/api/orders"
     );
 
+
+
     public Predicate<ServerHttpRequest> isSecured = request ->
             OPEN_API_ENDPOINTS.stream()
                     .noneMatch(uri -> request.getURI().getPath().contains(uri));

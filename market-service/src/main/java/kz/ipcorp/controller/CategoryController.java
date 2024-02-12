@@ -48,11 +48,10 @@ public class CategoryController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<List<ProductViewDTO>> getProducts(@CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
-                                                            @RequestParam("categoryId") UUID categoryId,
-                                                            @RequestParam(value = "page", defaultValue = "0") int page,
-                                                            @RequestParam(value = "size", defaultValue = "10") int size) {
-        return ResponseEntity.ok(categoryService.getProducts(categoryId, language, PageRequest.of(page, size)));
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<CategoryViewDTO> getCategoryById(@PathVariable("categoryId") UUID categoryId,
+                                                           @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
+        return ResponseEntity.ok(categoryService.getCategory(categoryId, language));
     }
+
 }

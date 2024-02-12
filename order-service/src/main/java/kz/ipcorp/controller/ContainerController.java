@@ -59,4 +59,11 @@ public class ContainerController {
         log.info("IN addStatus - containerId: {}", containerId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+    @DeleteMapping
+    public ResponseEntity<HttpStatus> deleteOrderFromContainer(ContainerOrderDeleteDTO containerOrderDeleteDTO) {
+        containerService.deleteOrderFromContainer(containerOrderDeleteDTO.getContainerId(), containerOrderDeleteDTO.getOrderId());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
 }

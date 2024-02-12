@@ -19,9 +19,9 @@ public class ProductViewDTO {
     private String description;
     private List<String> imagePaths = new ArrayList<>();
     private String categoryName;
+    private String companyName;
 
-    public ProductViewDTO() {
-    }
+    public ProductViewDTO() {}
 
     public ProductViewDTO(Product product, String language) {
         this.id = product.getId();
@@ -29,6 +29,7 @@ public class ProductViewDTO {
         this.price = product.getPrice();
         this.description = product.getDescription();
         this.imagePaths = new ArrayList<>(product.getImagePaths());
+        this.companyName = product.getCompany().getName();
         if (product.getCategory() != null) {
             switch (language){
                 case "ru" -> this.categoryName = product.getCategory().getLanguage().getRussian();

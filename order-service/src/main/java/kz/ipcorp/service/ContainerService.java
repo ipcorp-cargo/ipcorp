@@ -92,4 +92,13 @@ public class ContainerService {
         }
         containerRepository.save(container);
     }
+
+    @Transactional
+    public void deleteOrderFromContainer(UUID containerId, UUID orderId) {
+        try {
+            containerRepository.deleteOrderFromContainer(containerId, orderId);
+        } catch (Exception e) {
+            throw new NotFoundException("container or order not found, order is not in this container");
+        }
+    }
 }
