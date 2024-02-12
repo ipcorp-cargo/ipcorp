@@ -4,7 +4,9 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: "http://ipcorpn.com"
+            allowedOrigins:
+              - "https://ipcorpn.com"
+              - "https://api.ipcorpn.com"
             allowedMethods:
               - GET
               - POST
