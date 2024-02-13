@@ -10,29 +10,33 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
+@PreAuthorize(value = "hasAnyAuthority('USER')")
 public class OrderController {
     private final OrderService orderService;
     private final Logger log = LogManager.getLogger(OrderController.class);
 
     @PostMapping
     public ResponseEntity<OrderViewDTO> createOrder(@RequestBody OrderCreateDTO orderCreateDTO,
-                                                    @RequestHeader(value = "userId") String userId) {
-        log.info("IN createOrder - userId: {}, orderName: {}", userId, orderCreateDTO.getOrderName());
-        return new ResponseEntity<>(orderService.createOrder(orderCreateDTO, userId), HttpStatus.CREATED);
+                                                    Principal principal) {
+        log.info("IN createOrder - userId: {}, orderName: {}", principal.getName(), orderCreateDTO.getOrderName());
+        return new ResponseEntity<>(orderService.createOrder(orderCreateDTO, principal.getName()), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderDetailDTO>> getOrders(@RequestHeader(value = "userId", required = false) String userId,
-                                                          @CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
+    public ResponseEntity<List<OrderDetailDTO>> getOrders(@CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
                                                           @RequestParam(value = "page", defaultValue = "0") int page,
-                                                          @RequestParam(value = "size", defaultValue = "10") int size) {
+                                                          @RequestParam(value = "size", defaultValue = "10") int size,
+                                                          Principal principal) {
+        String userId = principal.getName();
         log.info("IN getOrders - userId: {}", userId);
         return new ResponseEntity<>(orderService.getOrders(userId, language, PageRequest.of(page, size)), HttpStatus.OK);
     }

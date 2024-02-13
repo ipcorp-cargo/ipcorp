@@ -2,6 +2,8 @@ package kz.ipcorp.config;
 
 import kz.ipcorp.exception.AuthException;
 import kz.ipcorp.service.JWTService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -18,6 +20,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     @Autowired
     private JWTService jwtService;
+    private final Logger log = LogManager.getLogger(AuthenticationFilter.class);
 
     public AuthenticationFilter() {
         super(Config.class);
@@ -25,10 +28,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     @Override
     public GatewayFilter apply(Config config) {
+        log.info("IN apply");
         return (((exchange, chain) -> {
-            System.out.println("======================");
-            System.out.println(exchange.getRequest().getPath());
-            System.out.println("======================");
+            log.info("======================");
+            log.info(exchange.getRequest().getPath());
+            log.info("======================");
 
             ServerHttpRequest request = null;
 
@@ -39,13 +43,16 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 String token = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
                 if (token != null && token.startsWith("Bearer ")) {
                     token = token.substring(7);
+                    System.out.println("have token");
                 }
-                try {
-                    request = exchange.getRequest().mutate()
-                            .header("userId", jwtService.extractID(token))
-                            .build();
-                } catch (Exception e) {
-                    throw new AuthException("ACCESS INVALID");
+                if(!jwtService.isTokenExpired(token)) {
+                    log.info("token is not expired");
+                    try {
+                        request = exchange.getRequest().mutate()
+                                .build();
+                    } catch (Exception e) {
+                        throw new AuthException("ACCESS INVALID");
+                    }
                 }
             }
             return chain.filter(exchange.mutate().request(request).build());

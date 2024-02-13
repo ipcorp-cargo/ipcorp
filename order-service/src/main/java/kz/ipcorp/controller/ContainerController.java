@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/containers")
 @RequiredArgsConstructor
+@PreAuthorize(value = "hasAnyAuthority('ADMIN')")
 public class ContainerController {
     private final ContainerService containerService;
     private final Logger log = LogManager.getLogger(ContainerController.class);
@@ -40,9 +42,8 @@ public class ContainerController {
 
 
     @PostMapping("/{containerId}/order")
-    public ResponseEntity<ContainerReadDTO> addOrder(@RequestHeader(value = "userId", required = false) UUID userID, @PathVariable("containerId") UUID containerId,
+    public ResponseEntity<ContainerReadDTO> addOrder(@PathVariable("containerId") UUID containerId,
                                                      @RequestBody ContainerOrderCreateDTO containerOrderCreateDTO) {
-        log.info("userID - {}", userID);
         log.info("IN addOrder - containerId: {}", containerId);
         return new ResponseEntity<>(containerService.addOrder(containerId, containerOrderCreateDTO.getTrackCode()), HttpStatus.CREATED);
     }
@@ -56,8 +57,8 @@ public class ContainerController {
     @PostMapping("/{containerId}/status")
     public ResponseEntity<HttpStatus> addStatus(@PathVariable("containerId") UUID containerId,
                                                 @RequestBody ContainerStatusDTO containerStatusDTO) {
-        containerService.updateContainerStatus(containerId, containerStatusDTO);
         log.info("IN addStatus - containerId: {}", containerId);
+        containerService.updateContainerStatus(containerId, containerStatusDTO);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 

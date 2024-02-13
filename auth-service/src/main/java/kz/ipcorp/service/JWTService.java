@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -21,7 +22,13 @@ public class JWTService {
 
         public String generateToken(User user){
             log.info("IN generateToken - access token has been generated");
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("role", user.getRole().toString());
+            claims.put("userId", user.getId().toString());
+            log.info("role: {}", claims.get("role"));
+            log.info("userId: {}", claims.get("userId"));
             return Jwts.builder()
+                    .setClaims(claims)
                     .setSubject(user.getId().toString())
                     .setIssuedAt(new Date(System.currentTimeMillis()))
                     .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
