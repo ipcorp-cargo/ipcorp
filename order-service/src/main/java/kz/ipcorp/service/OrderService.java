@@ -132,6 +132,11 @@ public class OrderService {
 
     @Transactional
     public Order saveOrder(String trackCode) {
+        if (orderRepository.existsByTrackCode(trackCode)) {
+            throw new DuplicateFormatFlagsException(
+                    String.format("order with track code already exists %s", trackCode)
+            );
+        }
         Order order = new Order();
         order.setTrackCode(trackCode);
         return orderRepository.save(order);

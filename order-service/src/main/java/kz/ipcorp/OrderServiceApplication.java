@@ -1,5 +1,7 @@
 package kz.ipcorp;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -8,8 +10,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 
+
 @SpringBootApplication
 @EnableFeignClients
+@OpenAPIDefinition(servers = {
+        @Server(url = "https://api.ipcorpn.com"),
+        @Server(url = "http://localhost:8765")
+})
 public class OrderServiceApplication {
 
     public static void main(String[] args) {
@@ -23,6 +30,7 @@ public class OrderServiceApplication {
     @Bean
     public OpenAPI usersMicroserviceOpenAPI() {
         final String securitySchemeName = "bearerAuth";
+
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement()
                         .addList(securitySchemeName))

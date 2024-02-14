@@ -1,22 +1,20 @@
 package kz.ipcorp.controller;
 
-import kz.ipcorp.model.DTO.AccessTokenRequestDTO;
 import kz.ipcorp.model.DTO.SignInRequestDTO;
 import kz.ipcorp.model.DTO.SignUpRequestDTO;
 import kz.ipcorp.model.DTO.TokenResponseDTO;
-import kz.ipcorp.model.entity.User;
 import kz.ipcorp.service.AuthenticationService;
-import kz.ipcorp.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -54,9 +52,10 @@ public class AuthController {
     }
 
     @DeleteMapping()
-    public ResponseEntity<HttpStatus> deleteUser(@RequestHeader("userId") UUID userId) {
-        log.info("delete with id {}", userId);
-        authenticationService.deleteUser(userId);
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<HttpStatus> deleteUser(Principal principal) {
+        log.info("delete with id {}", UUID.fromString(principal.getName()));
+        authenticationService.deleteUser(UUID.fromString(principal.getName()));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

@@ -23,9 +23,10 @@ public class ContainerController {
     private final Logger log = LogManager.getLogger(ContainerController.class);
 
     @GetMapping("/{containerId}")
-    public ResponseEntity<ContainerDetailDTO> getContainer(@PathVariable("containerId") UUID containerId) {
+    public ResponseEntity<ContainerDetailDTO> getContainer(@PathVariable("containerId") UUID containerId,
+                                                           @CookieValue(name = "Accept-Language") String language) {
         log.info("IN getContainer - containerId: {}", containerId.toString());
-        return new ResponseEntity<>(containerService.getContainerById(containerId), HttpStatus.OK);
+        return new ResponseEntity<>(containerService.getContainerById(containerId, language), HttpStatus.OK);
     }
 
     @GetMapping("/containerName")

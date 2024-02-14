@@ -1,12 +1,14 @@
 package kz.ipcorp.service;
 
 import kz.ipcorp.controller.StatusController;
+import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.StatusViewDTO;
 import kz.ipcorp.model.entity.Language;
 import kz.ipcorp.model.entity.Status;
 import kz.ipcorp.model.entity.User;
 import kz.ipcorp.model.entity.UserStatus;
+import kz.ipcorp.model.enumuration.Role;
 import kz.ipcorp.repository.StatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +30,7 @@ public class StatusService {
     @Transactional(readOnly = true)
     public List<Map<String, String>> getStatus(UUID userId, String language) {
         User user = userService.findById(userId);
+
         List<Map<String, String>> statuses = new ArrayList<>();
         for (UserStatus userStatus : user.getUserStatuses()) {
             Language statusLanguage = userStatus.getStatus().getLanguage();

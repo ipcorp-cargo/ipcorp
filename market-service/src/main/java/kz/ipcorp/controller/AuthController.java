@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/auth/seller")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -40,5 +40,9 @@ public class AuthController {
     public ResponseEntity<Void> resetPassword(@RequestBody SellerCreateDTO sellerCreateDTO){
         authService.resetPassword(sellerCreateDTO);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    public void setRefreshToken() {
+
     }
 }

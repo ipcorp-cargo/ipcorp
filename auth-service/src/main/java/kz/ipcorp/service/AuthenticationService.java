@@ -121,9 +121,6 @@ public class AuthenticationService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("user with id %s not found", userId))
         );
-        if (user.getRole() == Role.ADMIN) {
-            throw new NotConfirmedException("admin can not delete account");
-        }
         userRepository.delete(user);
     }
 }

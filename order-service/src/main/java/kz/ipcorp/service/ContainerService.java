@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -35,6 +36,12 @@ public class ContainerService {
         Container container = new Container();
         container.setName(createDTO.getName());
         container.setOrders(new ArrayList<>());
+
+        Status firstStatus = statusService.findById(UUID.fromString("7050543b-b370-4dfd-bc6b-888542aa26ca"))
+                .orElseThrow(() -> new NotFoundException("nurs statusti durstau kerek"));
+
+        container.setStatus(firstStatus);
+
         containerRepository.save(container);
         return new ContainerReadDTO(container);
     }
@@ -61,12 +68,12 @@ public class ContainerService {
         return new ContainerReadDTO(container);
     }
 
-    public ContainerDetailDTO getContainerById(UUID containerId) {
+    public ContainerDetailDTO getContainerById(UUID containerId, String language) {
         log.info("IN getContainerById - containerId: {}", containerId);
         Container container = containerRepository.findById(containerId).
                 orElseThrow(()
                         -> new NotFoundException(String.format("container with containerId %s not found", containerId)));
-        return new ContainerDetailDTO(container);
+        return new ContainerDetailDTO(container, language);
     }
 
     public List<ContainerReadDTO> getAll() {
