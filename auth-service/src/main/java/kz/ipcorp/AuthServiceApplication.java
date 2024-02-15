@@ -19,7 +19,13 @@ import org.springframework.context.annotation.Bean;
 public class AuthServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AuthServiceApplication.class, args);
+        try {
+            SpringApplication.run(AuthServiceApplication.class, args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
     @Bean
     public OpenAPI usersMicroserviceOpenAPI() {

@@ -5,6 +5,7 @@ import kz.ipcorp.service.BranchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -23,10 +24,5 @@ public class BranchController {
         return new ResponseEntity<>(branchService.getAllBranches(language), HttpStatus.OK);
     }
 
-    @PostMapping("/{branchId}")
-    public ResponseEntity<Void> addBranch(@PathVariable("branchId") UUID branchId,
-                                             Principal principal){
-        branchService.updateBranch(branchId, UUID.fromString(principal.getName()));
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+
 }

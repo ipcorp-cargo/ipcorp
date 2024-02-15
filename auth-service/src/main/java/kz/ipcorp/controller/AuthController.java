@@ -3,6 +3,7 @@ package kz.ipcorp.controller;
 import kz.ipcorp.model.DTO.SignInRequestDTO;
 import kz.ipcorp.model.DTO.SignUpRequestDTO;
 import kz.ipcorp.model.DTO.TokenResponseDTO;
+import kz.ipcorp.model.DTO.UserViewDTO;
 import kz.ipcorp.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +30,12 @@ public class AuthController {
         authenticationService.createUser(signUpRequestDTO);
         log.info("IN signUp - phoneNumber: {}", signUpRequestDTO.getPhoneNumber());
         return ResponseEntity.ok(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<UserViewDTO> getUserInfo(@CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
+                                                   Principal principal) {
+        return ResponseEntity.ok(authenticationService.getUserInfo(language, UUID.fromString(principal.getName())));
     }
 
     @PostMapping("/signin")
@@ -58,5 +65,13 @@ public class AuthController {
         authenticationService.deleteUser(UUID.fromString(principal.getName()));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+    @PostMapping("/branch/{branchId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Void> addBranch(@PathVariable("branchId") UUID branchId,
+                                          Principal principal){
+        authenticationService.updateBranch(branchId, UUID.fromString(principal.getName()));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
 }

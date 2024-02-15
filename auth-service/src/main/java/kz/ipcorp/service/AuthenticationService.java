@@ -1,10 +1,10 @@
 package kz.ipcorp.service;
 
 import kz.ipcorp.exception.*;
-import kz.ipcorp.model.DTO.AccessTokenRequestDTO;
 import kz.ipcorp.model.DTO.SignInRequestDTO;
 import kz.ipcorp.model.DTO.SignUpRequestDTO;
 import kz.ipcorp.model.DTO.TokenResponseDTO;
+import kz.ipcorp.model.DTO.UserViewDTO;
 import kz.ipcorp.model.entity.User;
 import kz.ipcorp.model.enumuration.Role;
 import kz.ipcorp.repository.UserRepository;
@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -29,6 +28,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
 
     private final SMSVerificationService verificationService;
+    private final BranchService branchService;
 
     private final JWTService jwtService;
     private final Logger log = LogManager.getLogger(AuthenticationService.class);
@@ -122,5 +122,15 @@ public class AuthenticationService {
                 () -> new NotFoundException(String.format("user with id %s not found", userId))
         );
         userRepository.delete(user);
+    }
+
+    @Transactional
+    public void updateBranch(UUID branchId, UUID uuid) {
+        branchService.updateBranch(branchId, uuid);
+    }
+
+    public UserViewDTO getUserInfo(String language, UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
+        return new UserViewDTO(user, language);
     }
 }
