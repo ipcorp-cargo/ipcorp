@@ -11,17 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- *
- * TODO: 2 post method
- *
- * 1 method -> SMSRequestDTO(phoneNumber, SMSRequestType(FORGOT_PASSWORD, REGISTER))
- * LOGICASI SMS JIBERY (30 minut limit, max 3 sms)
- *
- *
- * 2 method -> SMSVerificationDTO(phoneNumber, verificationCode(6 symbol))
- * LOGICASI VERIFY JASAU SMS CODDI
- * */
 @RestController
 @RequestMapping("/api/sms")
 @RequiredArgsConstructor
@@ -42,7 +31,7 @@ public class SMSController {
         )){
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.valueOf(431));
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 }

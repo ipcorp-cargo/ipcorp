@@ -29,9 +29,10 @@ CREATE TABLE IF NOT EXISTS orders
 (
     id         uuid NOT NULL PRIMARY KEY,
     order_name VARCHAR(255),
-    track_code VARCHAR(255),
+    track_code VARCHAR(255) UNIQUE,
     user_id    uuid,
-    status_id  uuid REFERENCES statuses (id)
+    status_id  uuid REFERENCES statuses (id),
+    creation_date TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS containers
@@ -39,7 +40,7 @@ CREATE TABLE IF NOT EXISTS containers
     id         uuid NOT NULL PRIMARY KEY,
     created_at TIMESTAMP(6),
     name       VARCHAR(255) UNIQUE,
-    status_id  uuid REFERENCES statuses (id) UNIQUE
+    status_id  uuid REFERENCES statuses (id)
 );
 
 CREATE TABLE IF NOT EXISTS container_orders
@@ -75,8 +76,6 @@ VALUES (5, 'Алып кетуге дайын', 'Ready to pick up', 'Готовы
 
 INSERT INTO languages(id, kazakh, english, russian, chinese)
 VALUES (6, 'Жеткізілді', 'Delivered', 'Доставлен', '交付');
-
-
 
 INSERT INTO statuses(id, language_id)
 VALUES ('7050543b-b370-4dfd-bc6b-888542aa26ca', 1);

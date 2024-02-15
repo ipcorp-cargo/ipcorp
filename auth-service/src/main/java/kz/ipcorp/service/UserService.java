@@ -1,6 +1,7 @@
 package kz.ipcorp.service;
 
 import kz.ipcorp.exception.NotFoundException;
+import kz.ipcorp.model.entity.Branch;
 import kz.ipcorp.model.entity.User;
 import kz.ipcorp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,13 @@ public class UserService {
         return phoneNumber -> userRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("user with phoneNumber %s not found", phoneNumber)));
+    }
+
+    @Transactional
+    public void addBranch(Branch branch, UUID userId){
+        User user = findById(userId);
+        user.setBranch(branch);
+        userRepository.saveAndFlush(user);
     }
 
 }
