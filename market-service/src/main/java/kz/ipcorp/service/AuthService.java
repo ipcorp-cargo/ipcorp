@@ -72,6 +72,7 @@ public class AuthService {
 
         Cookie cookie = new Cookie("refresh-token", refresh);
         cookie.setPath("/api/auth/seller/access-token");
+        cookie.setDomain("api.ipcorpn.com");
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
 
