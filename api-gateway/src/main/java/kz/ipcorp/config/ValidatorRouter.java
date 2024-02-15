@@ -20,7 +20,11 @@ public class ValidatorRouter {
             "/api/products",
             "/api/orders",
             "/api/categories",
-            "/api/companies"
+            "/api/companies",
+            "/api/emails",
+            "/api/emails/verify",
+            "/api/sms",
+            "/api/sms/verify"
     );
 
 
