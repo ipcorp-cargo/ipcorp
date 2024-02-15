@@ -19,12 +19,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
-@PreAuthorize(value = "hasAnyAuthority('USER')")
 public class OrderController {
     private final OrderService orderService;
     private final Logger log = LogManager.getLogger(OrderController.class);
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public ResponseEntity<OrderViewDTO> createOrder(@RequestBody OrderCreateDTO orderCreateDTO,
                                                     Principal principal) {
         log.info("IN createOrder - userId: {}, orderName: {}", principal.getName(), orderCreateDTO.getOrderName());
@@ -32,6 +32,7 @@ public class OrderController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public ResponseEntity<List<OrderDetailDTO>> getOrders(@CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
                                                           @RequestParam(value = "page", defaultValue = "0") int page,
                                                           @RequestParam(value = "size", defaultValue = "10") int size,
