@@ -25,7 +25,7 @@ public class Container {
 
     @OneToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id")
-    private Status status;
+    private ContainerStatus status;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(

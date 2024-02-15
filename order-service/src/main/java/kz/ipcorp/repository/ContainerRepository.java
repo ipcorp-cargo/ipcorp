@@ -14,6 +14,7 @@ public interface ContainerRepository extends JpaRepository<Container, UUID> {
 
     Optional<Container> findContainerByName(String containerName);
 
+    boolean existsByName(String name);
     @Modifying
     @Query(value = "DELETE FROM container_orders WHERE container_id = :containerId AND order_id = :orderId", nativeQuery = true)
     void deleteOrderFromContainer(UUID containerId, UUID orderId);

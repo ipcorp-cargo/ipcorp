@@ -5,6 +5,7 @@ import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.model.entity.Container;
+import kz.ipcorp.model.entity.ContainerStatus;
 import kz.ipcorp.model.entity.Order;
 import kz.ipcorp.model.entity.Status;
 import kz.ipcorp.repository.ContainerRepository;
@@ -33,16 +34,28 @@ public class ContainerService {
     public ContainerReadDTO createContainer(ContainerCreateDTO createDTO) {
         log.info("IN createContainer - containerName: {}", createDTO.getName());
 
+        if (containerRepository.existsByName(createDTO.getName())) {
+            throw new DuplicatedEntityException(String.format("container with name: '%s' already exists", createDTO.getName()));
+        }
+
         Container container = new Container();
         container.setName(createDTO.getName());
         container.setOrders(new ArrayList<>());
 
-        Status firstStatus = statusService.findById(UUID.fromString("7050543b-b370-4dfd-bc6b-888542aa26ca"))
+        ContainerStatus firstStatus = new ContainerStatus();
+
+        Status status = statusService.findById(UUID.fromString("7050543b-b370-4dfd-bc6b-888542aa26ca"))
                 .orElseThrow(() -> new NotFoundException("nurs statusti durstau kerek"));
+
 
         container.setStatus(firstStatus);
 
         containerRepository.save(container);
+
+        firstStatus.setContainer(container);
+
+
+//        TODO: do conca
         return new ContainerReadDTO(container);
     }
 
@@ -93,7 +106,9 @@ public class ContainerService {
                 .orElseThrow(() -> new NotFoundException("container not found"));
         Status status = statusService.findById(containerStatusDTO.getStatusId())
                 .orElseThrow(() -> new NotFoundException("status not found"));
-        container.setStatus(status);
+//        container.setStatus(status);
+
+//        TODO ContainerStatus
         for (Order order : container.getOrders()) {
             orderService.createOrderStatus(order, status);
             log.info("order: {}", order.getOrderName());

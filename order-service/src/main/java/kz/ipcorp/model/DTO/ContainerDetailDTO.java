@@ -28,7 +28,7 @@ public class ContainerDetailDTO {
         this.id = container.getId();
         this.name = container.getName();
         this.createdAt = container.getCreatedAt();
-        Language acceptLanguage = container.getStatus().getLanguage();
+        Language acceptLanguage = container.getStatus().getStatus().getLanguage();
         switch (language) {
             case "ru" -> { this.status = acceptLanguage.getRussian();}
             case "en" -> { this.status = acceptLanguage.getEnglish(); }

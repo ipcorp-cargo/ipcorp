@@ -24,7 +24,8 @@ public class ContainerController {
 
     @GetMapping("/{containerId}")
     public ResponseEntity<ContainerDetailDTO> getContainer(@PathVariable("containerId") UUID containerId,
-                                                           @CookieValue(name = "Accept-Language") String language) {
+                                                           @CookieValue(name = "Accept-Language",
+                                                           defaultValue = "ru") String language) {
         log.info("IN getContainer - containerId: {}", containerId.toString());
         return new ResponseEntity<>(containerService.getContainerById(containerId, language), HttpStatus.OK);
     }
