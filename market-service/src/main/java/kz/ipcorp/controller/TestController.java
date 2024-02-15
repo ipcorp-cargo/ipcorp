@@ -21,7 +21,8 @@ public class TestController {
 
     @GetMapping
     public String test(HttpServletRequest request) {
-        log.info("test {}", WebUtils.getCookie(request, "refresh-token").getValue());
+
+
         return prop;
     }
 }

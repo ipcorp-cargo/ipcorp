@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.WebUtils;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -34,14 +33,14 @@ public class AuthService {
 
     @Transactional
     public void createSeller(SellerCreateDTO sellerCreateDTO) {
-        if(!verificationService.isVerificationCodeValid(
+        if (!verificationService.isVerificationCodeValid(
                 sellerCreateDTO.getEmail(),
                 sellerCreateDTO.getVerificationCode()
-        )){
+        )) {
             throw new AuthenticationException("sms verification code incorrect");
         }
 
-        if (sellerRepository.findByEmail(sellerCreateDTO.getEmail()).isPresent()){
+        if (sellerRepository.findByEmail(sellerCreateDTO.getEmail()).isPresent()) {
             throw new DuplicateEntityException("there is already a seller with email");
         }
 
@@ -54,7 +53,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO, HttpServletResponse response) {
+    public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO, HttpServletResponse response, HttpServletRequest request) {
         var seller = sellerRepository.findByEmail(signInRequestDTO.getEmail())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("seller with email %s not found", signInRequestDTO.getEmail())));
@@ -70,18 +69,26 @@ public class AuthService {
         TokenResponseDTO tokens = new TokenResponseDTO();
         tokens.setAccessToken(access);
 
+//        String domain = request.getHeader("Host");
+
+        String domain = request.getHeader("Access-Control-Allow-Origin") != null ?
+                request.getHeader("Access-Control-Allow-Origin") : "localhost";
+
+        log.info("domain {}", domain);
+
         Cookie cookie = new Cookie("refresh-token", refresh);
         cookie.setPath("/api/auth/seller/access-token");
-        cookie.setDomain("api.ipcorpn.com");
+        cookie.setDomain(domain);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
-
+        log.info("IN signIn refresh token: {}", cookie.getValue());
         return tokens;
     }
 
     @Transactional(readOnly = true)
     public TokenResponseDTO accessToken(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, "refresh-token");
+        log.info("cookie {}", cookie);
         assert cookie != null;
         String refreshToken = cookie.getValue();
         log.info("refreshToken {}", refreshToken);
@@ -95,7 +102,6 @@ public class AuthService {
         log.info("IN accessToken - sellerEmail: {}", seller.getEmail());
         if (jwtService.isTokenValid(refreshToken)) {
             var access = jwtService.generateToken(seller);
-
             TokenResponseDTO tokens = new TokenResponseDTO();
             tokens.setAccessToken(access);
             return tokens;
@@ -104,16 +110,16 @@ public class AuthService {
     }
 
     @Transactional
-    public void resetPassword(SellerCreateDTO sellerCreateDTO){
+    public void resetPassword(SellerCreateDTO sellerCreateDTO) {
         String newPassword = sellerCreateDTO.getPassword();
         String verificationCode = sellerCreateDTO.getVerificationCode();
         String email = sellerCreateDTO.getEmail();
 
-        if(!verificationService.isVerificationCodeValid(email, verificationCode)){
+        if (!verificationService.isVerificationCodeValid(email, verificationCode)) {
             throw new AuthenticationException("sms verification code incorrect");
         }
 
-        if(newPassword == null || newPassword.isEmpty()){
+        if (newPassword == null || newPassword.isEmpty()) {
             throw new UserInputException("Password should not be empty");
         }
 
@@ -123,5 +129,19 @@ public class AuthService {
         seller.setPassword(passwordEncoder.encode(newPassword));
         sellerRepository.save(seller);
         verificationService.invalidateVerificationCode(email);
+    }
+
+    public void logout(HttpServletResponse response, HttpServletRequest request) {
+
+        String domain = request.getHeader("Access-Control-Allow-Origin") != null ?
+                request.getHeader("Access-Control-Allow-Origin") : "localhost";
+
+        log.info("domain {}", domain);
+
+        Cookie cookie = new Cookie("refresh-token", null);
+        cookie.setPath("/api/auth/seller/access-token");
+        cookie.setDomain(domain);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 }

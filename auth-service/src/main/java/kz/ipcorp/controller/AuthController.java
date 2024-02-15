@@ -58,4 +58,5 @@ public class AuthController {
         authenticationService.deleteUser(UUID.fromString(principal.getName()));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
 }

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Arrays;
 
 @RestController
@@ -29,10 +30,11 @@ public class AuthController {
     }
     @PostMapping("/signin")
     public ResponseEntity<TokenResponseDTO> signin(@RequestBody SignInRequestDTO signInRequestDTO,
-                                                   HttpServletResponse response){
+                                                   HttpServletResponse response,
+                                                   HttpServletRequest request){
         log.info("IN signin with email: {} {}", signInRequestDTO.getEmail(), signInRequestDTO.getPassword());
 
-        return new ResponseEntity<>(authService.signIn(signInRequestDTO, response), HttpStatus.OK);
+        return new ResponseEntity<>(authService.signIn(signInRequestDTO, response, request), HttpStatus.OK);
     }
 
     @PostMapping("/access-token")
@@ -48,5 +50,11 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/logout")
+    public ResponseEntity<HttpStatus> logout(HttpServletResponse response,
+                                             HttpServletRequest request) {
+        authService.logout(response, request);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 }
