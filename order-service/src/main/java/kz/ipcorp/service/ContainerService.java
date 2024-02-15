@@ -5,7 +5,6 @@ import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.model.entity.Container;
-import kz.ipcorp.model.entity.ContainerStatus;
 import kz.ipcorp.model.entity.Order;
 import kz.ipcorp.model.entity.Status;
 import kz.ipcorp.repository.ContainerRepository;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 
@@ -42,20 +40,10 @@ public class ContainerService {
         container.setName(createDTO.getName());
         container.setOrders(new ArrayList<>());
 
-        ContainerStatus firstStatus = new ContainerStatus();
-
         Status status = statusService.findById(UUID.fromString("7050543b-b370-4dfd-bc6b-888542aa26ca"))
-                .orElseThrow(() -> new NotFoundException("nurs statusti durstau kerek"));
-
-
-        container.setStatus(firstStatus);
-
+                .orElseThrow(() -> new NotFoundException("nurs statusti durst-au kerek"));
+        container.setStatus(status);
         containerRepository.save(container);
-
-        firstStatus.setContainer(container);
-
-
-//        TODO: do conca
         return new ContainerReadDTO(container);
     }
 
@@ -65,11 +53,11 @@ public class ContainerService {
 
         Container container = containerRepository.findById(containerId)
                 .orElseThrow(() -> new NotFoundException(String.format("container with containerId %s not found", containerId)));
-        Order order = orderService.getByTrackCode(trackCode).
-                orElse(orderService.saveOrder(trackCode));
+        Order order = orderService.getByTrackCode(trackCode).orElseGet(() -> orderService.saveOrder(trackCode));
         container.getOrders().add(order);
         Container savedContainer = containerRepository.saveAndFlush(container);
         orderService.addContainer(order, savedContainer);
+        orderService.createOrderStatus(order, container.getStatus());
         return new ContainerReadDTO(container);
     }
 
@@ -106,9 +94,7 @@ public class ContainerService {
                 .orElseThrow(() -> new NotFoundException("container not found"));
         Status status = statusService.findById(containerStatusDTO.getStatusId())
                 .orElseThrow(() -> new NotFoundException("status not found"));
-//        container.setStatus(status);
-
-//        TODO ContainerStatus
+        container.setStatus(status);
         for (Order order : container.getOrders()) {
             orderService.createOrderStatus(order, status);
             log.info("order: {}", order.getOrderName());

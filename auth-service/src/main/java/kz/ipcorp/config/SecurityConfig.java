@@ -39,7 +39,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.info("aaa");
+        log.info("IN securityFilterChain");
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> {
@@ -50,6 +50,7 @@ public class SecurityConfig {
                             .requestMatchers("/swagger-ui/**").permitAll()
                             .requestMatchers("/v3/api-docs/**").permitAll()
                             .requestMatchers("/swagger-resources/*").permitAll()
+                            .requestMatchers("/api/branches/").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
                             .requestMatchers("/api/admin").hasAnyAuthority(Role.ADMIN.name())
                             .requestMatchers("/api/user").hasAnyAuthority(Role.USER.name())
                             .anyRequest().permitAll();

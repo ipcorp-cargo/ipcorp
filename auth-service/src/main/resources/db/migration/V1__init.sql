@@ -1,5 +1,4 @@
-CREATE TABLE IF NOT EXISTS languages
-(
+CREATE TABLE IF NOT EXISTS languages(
     id      SERIAL NOT NULL PRIMARY KEY,
     kazakh  VARCHAR(255),
     english VARCHAR(255),
@@ -10,21 +9,30 @@ CREATE TABLE IF NOT EXISTS languages
     description_russian VARCHAR(255),
     description_chinese VARCHAR(255)
 );
-CREATE TABLE IF NOT EXISTS statuses
-(
+
+CREATE TABLE IF NOT EXISTS statuses(
     id          uuid NOT NULL PRIMARY KEY,
     language_id INTEGER,
     FOREIGN KEY (language_id) REFERENCES languages (id)
 );
-CREATE TABLE IF NOT EXISTS users
-(
+
+
+CREATE TABLE IF NOT EXISTS branches(
+    id            uuid NOT NULL PRIMARY KEY,
+    language_id bigint, FOREIGN KEY (language_id) REFERENCES languages (id)
+);
+
+
+CREATE TABLE IF NOT EXISTS users(
     id           uuid NOT NULL PRIMARY KEY,
     password     VARCHAR(255),
     phone_number VARCHAR(255) UNIQUE,
     role         VARCHAR(255)
         CONSTRAINT users_role_check
-            CHECK ((role)::TEXT = ANY ((ARRAY ['ADMIN'::CHARACTER VARYING, 'USER'::CHARACTER VARYING])::TEXT[]))
+            CHECK ((role)::TEXT = ANY ((ARRAY ['ADMIN'::CHARACTER VARYING, 'USER'::CHARACTER VARYING])::TEXT[])),
+    branch_id    uuid REFERENCES branches (id)
 );
+
 
 CREATE TABLE IF NOT EXISTS user_statuses
 (
@@ -75,6 +83,12 @@ INSERT INTO languages(id, kazakh, english, russian, chinese,
 VALUES (6, 'kazakh', 'Delivered', 'russian', 'chinese',
         'desc kazakh', 'desc english', 'desc russian', 'desc chinese');
 
+INSERT INTO languages(id, kazakh, english, russian, chinese)
+VALUES (7, 'Б. Момышұлы 75А', 'B. Momyshuly 75A', 'Б. Момышулы 75А', 'Б. Момышулы 75А');
+INSERT INTO languages(id, kazakh, english, russian, chinese)
+VALUES (8, 'Абай даңғылы 56в', '56v Abai Avenue', 'проспект Абая 56в', '阿拜道56b号');
+INSERT INTO languages(id, kazakh, english, russian, chinese)
+VALUES (9, 'Солтүстік Тас Жол Сақинасы', 'The Northern Ring Highway', 'Северное Кольцо Шоссе', '北环公路');
 
 
 INSERT INTO statuses(id, language_id)
@@ -89,6 +103,13 @@ INSERT INTO statuses(id, language_id)
 VALUES ('9a2f6db1-cf73-4d7b-bbf5-93632a8f070a',  5);
 INSERT INTO statuses(id, language_id)
 VALUES ('1cbd354c-341a-43ac-9136-94d2068896db',  6);
+
+INSERT INTO branches(id, language_id)
+VALUES ('7050543b-b370-4dfd-bc6b-888542aa26ca', 7);
+INSERT INTO branches(id, language_id)
+VALUES ('813a14f5-265f-4bb0-8dad-879d93e836aa', 8);
+INSERT INTO branches(id, language_id)
+VALUES ('258697fa-21b5-4e65-80f9-c287ec77a722', 9);
 
 INSERT INTO users(id, password, phone_number, role)
 VALUES ('0c6b9bf0-0c60-4a39-ab3f-0019d2fab9e2', '$2a$12$m0TJD2xZ6/RZysNGQSQ7qeap0gcWkaJELKJEcjYBdMHyUq55evoaq', '111',

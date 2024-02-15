@@ -28,12 +28,12 @@ public class ContainerDetailDTO {
         this.id = container.getId();
         this.name = container.getName();
         this.createdAt = container.getCreatedAt();
-        Language acceptLanguage = container.getStatus().getStatus().getLanguage();
+        Language acceptLanguage = container.getStatus().getLanguage();
         switch (language) {
-            case "ru" -> { this.status = acceptLanguage.getRussian();}
-            case "en" -> { this.status = acceptLanguage.getEnglish(); }
-            case "kk" -> { this.status = acceptLanguage.getKazakh(); }
-            case "cn" -> { this.status = acceptLanguage.getChinese(); }
+            case "ru" -> this.status = acceptLanguage.getRussian();
+            case "en" -> this.status = acceptLanguage.getEnglish();
+            case "kk" -> this.status = acceptLanguage.getKazakh();
+            case "cn" -> this.status = acceptLanguage.getChinese();
             default -> throw new NotConfirmedException("accept language not found");
         }
         for (Order order : container.getOrders()) {

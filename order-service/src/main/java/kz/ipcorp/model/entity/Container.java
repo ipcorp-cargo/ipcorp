@@ -23,9 +23,9 @@ public class Container {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id")
-    private ContainerStatus status;
+    private Status status;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(
