@@ -66,7 +66,6 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
     @PostMapping("/branch/{branchId}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> addBranch(@PathVariable("branchId") UUID branchId,
                                           Principal principal){
         authenticationService.updateBranch(branchId, UUID.fromString(principal.getName()));

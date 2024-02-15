@@ -16,7 +16,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/statuses")
 @RequiredArgsConstructor
-@PreAuthorize(value = "hasAnyAuthority('ADMIN')")
 public class StatusController {
 
     private final StatusService statusService;
