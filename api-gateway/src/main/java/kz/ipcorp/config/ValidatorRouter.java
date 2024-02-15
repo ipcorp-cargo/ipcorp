@@ -18,7 +18,9 @@ public class ValidatorRouter {
             "/v3/api-docs",
             "/swagger-ui/index.html",
             "/api/products",
-            "/api/orders"
+            "/api/orders",
+            "/api/categories",
+            "/api/companies"
     );
 
 

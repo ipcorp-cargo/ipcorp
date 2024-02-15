@@ -25,7 +25,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class
+SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final SellerService sellerService;
