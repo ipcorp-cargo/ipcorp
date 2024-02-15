@@ -109,10 +109,15 @@ services:
       context: ./market-service
       dockerfile: Dockerfile
     ports:
-      - "8085:8085"
-    expose:
-      - "8085"
-    container_name: market-service
+      - ":8085"
+    deploy:
+      mode: replicated
+      replicas: 2
+    volumes:
+      - market-data:/market-service/logs
+#    expose:
+#      - "8085"
+#    container_name: market-service
     environment:
       - DISCOVERY_SERVICE_URL=http://eureka-server:8761/eureka
       - CONFIG_SERVER=http://cloud-config:8888
@@ -180,4 +185,5 @@ volumes:
   db-auth:
   db-market:
   media-data:
+  market-data:
 

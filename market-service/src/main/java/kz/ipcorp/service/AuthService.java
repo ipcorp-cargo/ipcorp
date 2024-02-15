@@ -1,5 +1,8 @@
 package kz.ipcorp.service;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kz.ipcorp.exception.AuthenticationException;
 import kz.ipcorp.exception.DuplicateEntityException;
 import kz.ipcorp.exception.NotFoundException;
@@ -13,7 +16,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.WebUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -49,7 +54,7 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
+    public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO, HttpServletResponse response) {
         var seller = sellerRepository.findByEmail(signInRequestDTO.getEmail())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("seller with email %s not found", signInRequestDTO.getEmail())));
@@ -64,13 +69,25 @@ public class AuthService {
 
         TokenResponseDTO tokens = new TokenResponseDTO();
         tokens.setAccessToken(access);
-        tokens.setRefreshToken(refresh);
+
+        Cookie cookie = new Cookie("refresh-token", refresh);
+        cookie.setPath("/api/auth/seller/access-token");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
 
         return tokens;
     }
 
     @Transactional(readOnly = true)
-    public TokenResponseDTO accessToken(String refreshToken) {
+    public TokenResponseDTO accessToken(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, "refresh-token");
+        assert cookie != null;
+        String refreshToken = cookie.getValue();
+        log.info("refreshToken {}", refreshToken);
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new AuthenticationException("refresh-token is not exists");
+        }
+
         UUID sellerId = UUID.fromString(jwtService.extractUsername(refreshToken));
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new NotFoundException("seller is not found"));
 
@@ -80,7 +97,6 @@ public class AuthService {
 
             TokenResponseDTO tokens = new TokenResponseDTO();
             tokens.setAccessToken(access);
-            tokens.setRefreshToken(refreshToken);
             return tokens;
         }
         return null;

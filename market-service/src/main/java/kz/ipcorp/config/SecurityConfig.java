@@ -36,6 +36,7 @@ SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/open").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                                 .requestMatchers("/api/emails/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()

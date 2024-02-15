@@ -1,6 +1,8 @@
 package kz.ipcorp.controller;
 
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api/auth/seller")
@@ -24,15 +28,17 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     @PostMapping("/signin")
-    public ResponseEntity<TokenResponseDTO> signin(@RequestBody SignInRequestDTO signInRequestDTO){
+    public ResponseEntity<TokenResponseDTO> signin(@RequestBody SignInRequestDTO signInRequestDTO,
+                                                   HttpServletResponse response){
         log.info("IN signin with email: {} {}", signInRequestDTO.getEmail(), signInRequestDTO.getPassword());
-        return new ResponseEntity<>(authService.signIn(signInRequestDTO), HttpStatus.OK);
+
+        return new ResponseEntity<>(authService.signIn(signInRequestDTO, response), HttpStatus.OK);
     }
 
     @PostMapping("/access-token")
-    public ResponseEntity<TokenResponseDTO> accessToken(@CookieValue(name = "refreshToken") String refreshToken) {
-        log.info("cookie {}", refreshToken);
-        return ResponseEntity.ok(authService.accessToken(refreshToken));
+    public ResponseEntity<TokenResponseDTO> accessToken(HttpServletRequest request) {
+//        log.info("cookie {}", refreshToken);
+        return ResponseEntity.ok(authService.accessToken(request));
     }
 
 
@@ -42,7 +48,5 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    public void setRefreshToken() {
 
-    }
 }
