@@ -1,6 +1,5 @@
 package kz.ipcorp.controller;
 
-import jakarta.ws.rs.Path;
 import kz.ipcorp.model.DTO.*;
 import kz.ipcorp.service.ContainerService;
 import lombok.RequiredArgsConstructor;

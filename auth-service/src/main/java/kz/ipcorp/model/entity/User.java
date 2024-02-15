@@ -31,6 +31,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @ManyToOne
+    @JoinColumn(name = "branch_id", referencedColumnName = "id")
+    private Branch branch;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserStatus> userStatuses = new ArrayList<>();
 
