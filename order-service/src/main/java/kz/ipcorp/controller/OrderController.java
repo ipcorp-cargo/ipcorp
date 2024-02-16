@@ -1,5 +1,6 @@
 package kz.ipcorp.controller;
 
+import kz.ipcorp.model.DTO.OrderUpdateStatus;
 import kz.ipcorp.model.DTO.OrderCreateDTO;
 import kz.ipcorp.model.DTO.OrderDetailDTO;
 import kz.ipcorp.model.DTO.OrderViewDTO;
@@ -40,6 +41,14 @@ public class OrderController {
         String userId = principal.getName();
         log.info("IN getOrders - userId: {}", userId);
         return new ResponseEntity<>(orderService.getOrders(userId, language, PageRequest.of(page, size)), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PostMapping("/status")
+    public ResponseEntity<OrderDetailDTO> updateStatusOrderByTrackCode(@RequestBody OrderUpdateStatus orderUpdateStatus,
+                                                                       @CookieValue(name = "Accept-Language", defaultValue = "ru") String language){
+        log.info("IN updateStatusOrderByTrackCode - orderTrackCode: {}", orderUpdateStatus.getTrackCode());
+        return new ResponseEntity<>(orderService.updateStatus(orderUpdateStatus, language),HttpStatus.OK);
     }
 
 

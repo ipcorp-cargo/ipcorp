@@ -1,6 +1,7 @@
 package kz.ipcorp.exception.handler;
 
 import kz.ipcorp.exception.DuplicatedEntityException;
+import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,5 +31,13 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiExceptionResponse, httpStatus);
     }
 
-
+    @ExceptionHandler(NotConfirmedException.class)
+    public ResponseEntity<?> handleNotConfirmedException(NotConfirmedException e){
+        HttpStatus httpStatus = HttpStatus.CONFLICT;
+        ApiExceptionResponse apiExceptionResponse = new ApiExceptionResponse(
+                e.getMessage(),
+                httpStatus.value()
+        );
+        return new ResponseEntity<>(apiExceptionResponse, httpStatus);
+    }
 }

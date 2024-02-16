@@ -1,20 +1,17 @@
 package kz.ipcorp.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.enums.ParameterStyle;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
 import kz.ipcorp.model.DTO.CompanyVerifyDTO;
 import kz.ipcorp.model.enumuration.Status;
-import kz.ipcorp.model.enumuration.StatusVerify;
 import kz.ipcorp.service.CompanyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,9 +35,10 @@ public class CompanyController {
 
 
     @GetMapping()
-    public ResponseEntity<List<CompanyReadDTO>> getCompanies() {
+    public ResponseEntity<List<CompanyReadDTO>> getCompanies(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                             @RequestParam(value = "size", defaultValue = "10") int size) {
         log.info("IN getCompanies");
-        return new ResponseEntity<>(companyService.getCompanies(), HttpStatus.OK);
+        return new ResponseEntity<>(companyService.getCompanies(PageRequest.of(page, size)), HttpStatus.OK);
     }
 
     @GetMapping("/filter")
@@ -49,6 +48,21 @@ public class CompanyController {
                                                                      @RequestParam("status") Status status) {
         log.info("IN getCompaniesByFilter");
         return new ResponseEntity<>(companyService.getCompaniesByFilter(status), HttpStatus.OK);
+    }
+
+    @GetMapping("/filter/{date}")
+    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                                   @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                   @RequestParam(value = "size", defaultValue = "10") int size) {
+        log.info("IN getCompaniesByDate");
+        return new ResponseEntity<>(companyService.getCompaniesByDate(date, PageRequest.of(page, size)), HttpStatus.OK);
+    }
+    @GetMapping("/filter/{companyName}")
+    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByName(@PathVariable("companyName") String companyName,
+                                                                   @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                   @RequestParam(value = "size", defaultValue = "10") int size) {
+        log.info("IN getCompaniesByName");
+        return new ResponseEntity<>(companyService.getCompaniesByName(companyName, PageRequest.of(page, size)), HttpStatus.OK);
     }
 
     @GetMapping("/seller")

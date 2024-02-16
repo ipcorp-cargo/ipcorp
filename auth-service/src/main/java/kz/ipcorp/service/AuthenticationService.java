@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -57,6 +58,7 @@ public class AuthenticationService {
         user.setPhoneNumber(signUpRequestDTO.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
         user.setRole(Role.USER);
+        user.setCreatedAt(LocalDate.now());
         userRepository.save(user);
         log.info("IN createUser - phoneNumber: {}", signUpRequestDTO.getPhoneNumber());
         verificationService.invalidateVerificationCode(signUpRequestDTO.getPhoneNumber());

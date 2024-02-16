@@ -1,8 +1,10 @@
 package kz.ipcorp.service;
 
+import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
 import kz.ipcorp.model.DTO.OrderCreateDTO;
 import kz.ipcorp.model.DTO.OrderDetailDTO;
+import kz.ipcorp.model.DTO.OrderUpdateStatus;
 import kz.ipcorp.model.DTO.OrderViewDTO;
 import kz.ipcorp.model.entity.*;
 import kz.ipcorp.repository.OrderRepository;
@@ -22,6 +24,7 @@ import java.util.*;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderStatusRepository orderStatusRepository;
+    private final StatusService statusService;
     private final Logger log = LogManager.getLogger(OrderService.class);
 
     @Transactional
@@ -37,6 +40,18 @@ public class OrderService {
                 .orderName(order.getOrderName())
                 .trackCode(order.getTrackCode())
                 .build();
+    }
+    @Transactional(readOnly = true)
+    public Order getById(UUID orderId){
+        return orderRepository.findById(orderId).
+                orElseThrow(() -> new NotFoundException("order not found"));
+    }
+
+    @Transactional
+    public void deleteContainerFromOrder(UUID orderId){
+        Order order = getById(orderId);
+        order.setContainer(null);
+        orderRepository.saveAndFlush(order);
     }
 
     @Transactional(readOnly = true)
@@ -139,5 +154,25 @@ public class OrderService {
         Order order = new Order();
         order.setTrackCode(trackCode);
         return orderRepository.save(order);
+    }
+
+    @Transactional
+    public OrderDetailDTO updateStatus(OrderUpdateStatus orderUpdateStatus, String language) {
+        Order order = getByTrackCode(orderUpdateStatus.getTrackCode())
+                .orElseThrow(() -> new NotFoundException(String.format("order with track code %s not found", orderUpdateStatus.getTrackCode())));
+        if(!order.getStatus().getId().toString().equals("3a7b1136-2a5f-41a6-bedf-1f7968b2a781")){
+            throw new NotConfirmedException("incorrect status");
+        }else{
+            Status status = statusService.findById(orderUpdateStatus.getStatusId())
+                    .orElseThrow(() -> new NotFoundException(String.format("status with statusId %s not found", orderUpdateStatus.getStatusId())));
+            createOrderStatus(order, status);
+        }
+        Order updatedOrder = orderRepository.saveAndFlush(order);
+        return OrderDetailDTO.builder()
+                .id(updatedOrder.getId())
+                .orderName(updatedOrder.getOrderName())
+                .statusList(statusConverter(updatedOrder.getOrderStatuses(), language))
+                .trackCode(updatedOrder.getTrackCode())
+                .build();
     }
 }

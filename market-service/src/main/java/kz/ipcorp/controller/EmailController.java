@@ -1,8 +1,6 @@
 package kz.ipcorp.controller;
 
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.SchemaProperty;
+
 import kz.ipcorp.model.DTO.SMSRequestDTO;
 import kz.ipcorp.model.DTO.SMSVerificationDTO;
 import kz.ipcorp.service.EmailVerificationService;

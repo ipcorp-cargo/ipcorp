@@ -13,9 +13,11 @@ import kz.ipcorp.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
@@ -65,6 +67,7 @@ public class CompanyService {
         company.setRegistrationAddress(companyCreateDTO.getRegistrationAddress());
         company.setBusinessActivity(companyCreateDTO.getBusinessActivity());
         company.setRegistrationNumber(companyCreateDTO.getRegistrationNumber());
+        company.setCreatedAt(LocalDate.now());
         company.setSeller(seller);
         Company savedCompany = companyRepository.save(company);
         seller.setCompany(savedCompany);
@@ -79,6 +82,8 @@ public class CompanyService {
         Company company = companyRepository.findById(companyId).orElseThrow(() -> new NotFoundException("company not found"));
         if (company.getStatus() == Status.ACCEPT || company.getStatus() == Status.UPLOADED) {
             throw new NotConfirmedException("company can not uploaded document. Document status is accept or waiting");
+        }else{
+            company.setPathToBusinessLicense(pathToBusinessLicense);
         }
         company.setStatus(Status.UPLOADED);
         companyRepository.saveAndFlush(company);
@@ -113,9 +118,9 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public List<CompanyReadDTO> getCompanies() {
+    public List<CompanyReadDTO> getCompanies(PageRequest of) {
         List<CompanyReadDTO> companies = new ArrayList<>();
-        for (Company company : companyRepository.findAll()) {
+        for (Company company : companyRepository.findAll(of)) {
             companies.add(new CompanyReadDTO(company));
         }
         return companies;
@@ -129,6 +134,22 @@ public class CompanyService {
             companies.add(new CompanyReadDTO(company));
         }
         return companies;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CompanyReadDTO> getCompaniesByName(String companyName, PageRequest of) {
+        return companyRepository.findByNameContainingIgnoreCase(companyName, of)
+                .stream()
+                .map(CompanyReadDTO::new)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CompanyReadDTO> getCompaniesByDate(LocalDate date, PageRequest of) {
+        return companyRepository.findByCreatedAt(date, of)
+                .stream()
+                .map(CompanyReadDTO::new)
+                .toList();
     }
 }
 

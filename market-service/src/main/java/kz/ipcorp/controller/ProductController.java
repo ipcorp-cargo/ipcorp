@@ -1,14 +1,12 @@
 package kz.ipcorp.controller;
 
-import jakarta.ws.rs.Path;
 import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.ProductSaveDTO;
 import kz.ipcorp.model.DTO.ProductViewDTO;
-import kz.ipcorp.model.entity.Product;
 import kz.ipcorp.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +16,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,7 +70,6 @@ public class ProductController {
     ) {
         return ResponseEntity.ok(productService.getProductsByCategory(categoryId, language, PageRequest.of(page, size)));
     }
-
     @DeleteMapping("/{productId}")
     public ResponseEntity<HttpStatus> deleteOrder(@PathVariable("productId") UUID productId,
                                                   Principal principal) {

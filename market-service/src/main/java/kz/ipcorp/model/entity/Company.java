@@ -5,6 +5,7 @@ import kz.ipcorp.model.enumuration.Status;
 import lombok.Data;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,9 @@ public class Company {
 
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
+
+    @Column(name = "created_at")
+    private LocalDate createdAt = LocalDate.now();;
 
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();

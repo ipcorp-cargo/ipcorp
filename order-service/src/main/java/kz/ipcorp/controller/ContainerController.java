@@ -5,6 +5,7 @@ import kz.ipcorp.service.ContainerService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,9 +51,10 @@ public class ContainerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ContainerReadDTO>> getAll() {
+    public ResponseEntity<List<ContainerReadDTO>> getAll( @RequestParam(value = "page", defaultValue = "0") int page,
+                                                          @RequestParam(value = "size", defaultValue = "10") int size) {
         log.info("IN getAll - get all containers");
-        return new ResponseEntity<>(containerService.getAll(), HttpStatus.OK);
+        return new ResponseEntity<>(containerService.getAll(PageRequest.of(page, size)), HttpStatus.OK);
     }
 
     @PostMapping("/{containerId}/status")
