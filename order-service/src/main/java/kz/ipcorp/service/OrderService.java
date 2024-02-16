@@ -35,6 +35,7 @@ public class OrderService {
         if (orderRepository.existsByTrackCode(orderCreateDTO.getTrackCode())) {
             Order order = orderRepository.findByTrackCode(orderCreateDTO.getTrackCode()).get();
             order.setUserId(UUID.fromString(userId));
+            order.setOrderName(orderCreateDTO.getOrderName());
             orderRepository.save(order);
             return OrderViewDTO.builder()
                     .id(order.getId())
