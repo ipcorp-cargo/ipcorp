@@ -57,8 +57,8 @@ public class CompanyController {
         log.info("IN getCompaniesByDate");
         return new ResponseEntity<>(companyService.getCompaniesByDate(date, PageRequest.of(page, size)), HttpStatus.OK);
     }
-    @GetMapping("/filter/{companyName}")
-    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByName(@PathVariable("companyName") String companyName,
+    @GetMapping("/filter/name")
+    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByName(@RequestParam("companyName") String companyName,
                                                                    @RequestParam(value = "page", defaultValue = "0") int page,
                                                                    @RequestParam(value = "size", defaultValue = "10") int size) {
         log.info("IN getCompaniesByName");
