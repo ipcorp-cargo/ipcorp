@@ -13,10 +13,12 @@ import java.util.UUID;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, UUID> {
 
-    Page<Order> findAllByUserId(UUID userId, Pageable pageable);
+    Page<Order> findAllByUserIdAndStatus(UUID userId, Pageable pageable, Status status);
     Optional<Order> findByTrackCode(String trackCode);
 
     boolean existsByTrackCode(String trackCode);
 
     Page<Order> findAllByStatus(Pageable pageable, Status status);
+
+    Page<Order> findAllByUserId(UUID uuid, Pageable pageable);
 }

@@ -31,16 +31,29 @@ public class OrderService {
     @Transactional
     public OrderViewDTO createOrder(OrderCreateDTO orderCreateDTO, String userId) {
         log.info("IN createOrder - orderName: {}, userId: {}", orderCreateDTO.getOrderName(), userId);
-        Order order = new Order();
-        order.setTrackCode(orderCreateDTO.getTrackCode());
-        order.setOrderName(orderCreateDTO.getOrderName());
-        order.setUserId(UUID.fromString(userId));
-        orderRepository.save(order);
-        return OrderViewDTO.builder()
-                .id(order.getId())
-                .orderName(order.getOrderName())
-                .trackCode(order.getTrackCode())
-                .build();
+
+        if (orderRepository.existsByTrackCode(orderCreateDTO.getTrackCode())) {
+            Order order = orderRepository.findByTrackCode(orderCreateDTO.getTrackCode()).get();
+            order.setUserId(UUID.fromString(userId));
+            orderRepository.save(order);
+            return OrderViewDTO.builder()
+                    .id(order.getId())
+                    .orderName(order.getOrderName())
+                    .trackCode(order.getTrackCode())
+                    .build();
+        } else {
+            Order order = new Order();
+            order.setTrackCode(orderCreateDTO.getTrackCode());
+            order.setOrderName(orderCreateDTO.getOrderName());
+            order.setUserId(UUID.fromString(userId));
+            orderRepository.save(order);
+            return OrderViewDTO.builder()
+                    .id(order.getId())
+                    .orderName(order.getOrderName())
+                    .trackCode(order.getTrackCode())
+                    .build();
+        }
+
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +88,16 @@ public class OrderService {
                 );
             }
         } else {
-            Page<Order> ordersList = orderRepository.findAllByUserId(UUID.fromString(userId), pageable);
+            Page<Order> ordersList;
+
+            if (statusId != null) {
+                Status status = statusRepository.findById(statusId).orElseThrow(() -> new NotFoundException(
+                        String.format("status with id: %s not found", statusId)
+                ));
+                ordersList = orderRepository.findAllByUserIdAndStatus(UUID.fromString(userId), pageable, status);
+            } else {
+                ordersList = orderRepository.findAllByUserId(UUID.fromString(userId), pageable);
+            }
             for (Order order : ordersList) {
                 orders.add(
                         OrderDetailDTO.builder()
@@ -135,20 +157,20 @@ public class OrderService {
             Language statusLanguage = status.getLanguage();
             switch (language) {
                 case "en" -> statuses.add(Map.of(
-                        "status" , statusLanguage.getEnglish(),
-                        "time" , orderStatus.getCreatedAt().toString()
+                        "status", statusLanguage.getEnglish(),
+                        "time", orderStatus.getCreatedAt().toString()
                 ));
                 case "kk" -> statuses.add(Map.of(
-                        "status" , statusLanguage.getKazakh(),
-                        "time" , orderStatus.getCreatedAt().toString()
+                        "status", statusLanguage.getKazakh(),
+                        "time", orderStatus.getCreatedAt().toString()
                 ));
                 case "ru" -> statuses.add(Map.of(
-                        "status" , statusLanguage.getRussian(),
-                        "time" , orderStatus.getCreatedAt().toString()
+                        "status", statusLanguage.getRussian(),
+                        "time", orderStatus.getCreatedAt().toString()
                 ));
                 case "cn" -> statuses.add(Map.of(
-                        "status" , statusLanguage.getChinese(),
-                        "time" , orderStatus.getCreatedAt().toString()
+                        "status", statusLanguage.getChinese(),
+                        "time", orderStatus.getCreatedAt().toString()
                 ));
                 default -> throw new IllegalStateException("Unexpected value: " + language);
             }
