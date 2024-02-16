@@ -30,7 +30,6 @@ public class StatusService {
     @Transactional(readOnly = true)
     public List<Map<String, String>> getStatus(UUID userId, String language) {
         User user = userService.findById(userId);
-
         List<Map<String, String>> statuses = new ArrayList<>();
         for (UserStatus userStatus : user.getUserStatuses()) {
             Language statusLanguage = userStatus.getStatus().getLanguage();

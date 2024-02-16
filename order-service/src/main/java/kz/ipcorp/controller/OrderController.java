@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -37,10 +38,11 @@ public class OrderController {
     public ResponseEntity<List<OrderDetailDTO>> getOrders(@CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
                                                           @RequestParam(value = "page", defaultValue = "0") int page,
                                                           @RequestParam(value = "size", defaultValue = "10") int size,
+                                                          @RequestParam(value = "statusId", required = false) UUID statusId,
                                                           Principal principal) {
         String userId = principal.getName();
         log.info("IN getOrders - userId: {}", userId);
-        return new ResponseEntity<>(orderService.getOrders(userId, language, PageRequest.of(page, size)), HttpStatus.OK);
+        return new ResponseEntity<>(orderService.getOrders(userId, language, PageRequest.of(page, size), statusId), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")

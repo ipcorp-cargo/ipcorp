@@ -9,11 +9,14 @@ import kz.ipcorp.model.DTO.OrderViewDTO;
 import kz.ipcorp.model.entity.*;
 import kz.ipcorp.repository.OrderRepository;
 import kz.ipcorp.repository.OrderStatusRepository;
+import kz.ipcorp.repository.StatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,20 +29,35 @@ public class OrderService {
     private final OrderStatusRepository orderStatusRepository;
     private final StatusService statusService;
     private final Logger log = LogManager.getLogger(OrderService.class);
+    private final StatusRepository statusRepository;
 
     @Transactional
     public OrderViewDTO createOrder(OrderCreateDTO orderCreateDTO, String userId) {
         log.info("IN createOrder - orderName: {}, userId: {}", orderCreateDTO.getOrderName(), userId);
-        Order order = new Order();
-        order.setTrackCode(orderCreateDTO.getTrackCode());
-        order.setOrderName(orderCreateDTO.getOrderName());
-        order.setUserId(UUID.fromString(userId));
-        orderRepository.save(order);
-        return OrderViewDTO.builder()
-                .id(order.getId())
-                .orderName(order.getOrderName())
-                .trackCode(order.getTrackCode())
-                .build();
+
+        if (orderRepository.existsByTrackCode(orderCreateDTO.getTrackCode())) {
+            Order order = orderRepository.findByTrackCode(orderCreateDTO.getTrackCode()).get();
+            order.setUserId(UUID.fromString(userId));
+            order.setOrderName(orderCreateDTO.getOrderName());
+            orderRepository.save(order);
+            return OrderViewDTO.builder()
+                    .id(order.getId())
+                    .orderName(order.getOrderName())
+                    .trackCode(order.getTrackCode())
+                    .build();
+        } else {
+            Order order = new Order();
+            order.setTrackCode(orderCreateDTO.getTrackCode());
+            order.setOrderName(orderCreateDTO.getOrderName());
+            order.setUserId(UUID.fromString(userId));
+            orderRepository.save(order);
+            return OrderViewDTO.builder()
+                    .id(order.getId())
+                    .orderName(order.getOrderName())
+                    .trackCode(order.getTrackCode())
+                    .build();
+        }
+
     }
     @Transactional(readOnly = true)
     public Order getById(UUID orderId){
@@ -61,19 +79,51 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderDetailDTO> getOrders(String userId, String language, Pageable pageable) {
+    public List<OrderDetailDTO> getOrders(String userId, String language, Pageable pageable, UUID statusId) {
         log.info("IN getOrders - userId: {}", userId);
-        Page<Order> ordersList = orderRepository.findAllByUserId(UUID.fromString(userId), pageable);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean hasAdminRole = authentication.getAuthorities().stream()
+                .anyMatch(r -> r.getAuthority().equals("ADMIN"));
+
         List<OrderDetailDTO> orders = new ArrayList<>();
-        for (Order order : ordersList) {
-            orders.add(
-                    OrderDetailDTO.builder()
-                            .id(order.getId())
-                            .orderName(order.getOrderName())
-                            .trackCode(order.getTrackCode())
-                            .statusList(statusConverter(order.getOrderStatuses(), language))
-                            .build()
-            );
+        if (hasAdminRole) {
+            Status status = statusRepository.findById(statusId).orElseThrow(() -> new NotFoundException(
+                    String.format("status with id: %s not found", statusId)
+            ));
+            Page<Order> orderList = orderRepository.findAllByStatus(pageable, status);
+            for (Order order : orderList) {
+                orders.add(
+                        OrderDetailDTO.builder()
+                                .id(order.getId())
+                                .orderName(order.getOrderName())
+                                .trackCode(order.getTrackCode())
+                                .statusList(statusConverter(order.getOrderStatuses(), language))
+                                .build()
+                );
+            }
+        } else {
+            Page<Order> ordersList;
+
+            if (statusId != null) {
+                Status status = statusRepository.findById(statusId).orElseThrow(() -> new NotFoundException(
+                        String.format("status with id: %s not found", statusId)
+                ));
+                ordersList = orderRepository.findAllByUserIdAndStatus(UUID.fromString(userId), pageable, status);
+            } else {
+                ordersList = orderRepository.findAllByUserId(UUID.fromString(userId), pageable);
+            }
+            for (Order order : ordersList) {
+                orders.add(
+                        OrderDetailDTO.builder()
+                                .id(order.getId())
+                                .orderName(order.getOrderName())
+                                .trackCode(order.getTrackCode())
+                                .statusList(statusConverter(order.getOrderStatuses(), language))
+                                .build()
+                );
+            }
         }
         return orders;
     }
@@ -123,20 +173,20 @@ public class OrderService {
             Language statusLanguage = status.getLanguage();
             switch (language) {
                 case "en" -> statuses.add(Map.of(
-                        "status" , statusLanguage.getEnglish(),
-                        "time" , orderStatus.getCreatedAt().toString()
+                        "status", statusLanguage.getEnglish(),
+                        "time", orderStatus.getCreatedAt().toString()
                 ));
                 case "kk" -> statuses.add(Map.of(
-                        "status" , statusLanguage.getKazakh(),
-                        "time" , orderStatus.getCreatedAt().toString()
+                        "status", statusLanguage.getKazakh(),
+                        "time", orderStatus.getCreatedAt().toString()
                 ));
                 case "ru" -> statuses.add(Map.of(
-                        "status" , statusLanguage.getRussian(),
-                        "time" , orderStatus.getCreatedAt().toString()
+                        "status", statusLanguage.getRussian(),
+                        "time", orderStatus.getCreatedAt().toString()
                 ));
                 case "cn" -> statuses.add(Map.of(
-                        "status" , statusLanguage.getChinese(),
-                        "time" , orderStatus.getCreatedAt().toString()
+                        "status", statusLanguage.getChinese(),
+                        "time", orderStatus.getCreatedAt().toString()
                 ));
                 default -> throw new IllegalStateException("Unexpected value: " + language);
             }
