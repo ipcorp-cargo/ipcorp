@@ -7,11 +7,14 @@ import kz.ipcorp.model.DTO.OrderViewDTO;
 import kz.ipcorp.model.entity.*;
 import kz.ipcorp.repository.OrderRepository;
 import kz.ipcorp.repository.OrderStatusRepository;
+import kz.ipcorp.repository.StatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderStatusRepository orderStatusRepository;
     private final Logger log = LogManager.getLogger(OrderService.class);
+    private final StatusRepository statusRepository;
 
     @Transactional
     public OrderViewDTO createOrder(OrderCreateDTO orderCreateDTO, String userId) {
@@ -46,19 +50,42 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderDetailDTO> getOrders(String userId, String language, Pageable pageable) {
+    public List<OrderDetailDTO> getOrders(String userId, String language, Pageable pageable, UUID statusId) {
         log.info("IN getOrders - userId: {}", userId);
-        Page<Order> ordersList = orderRepository.findAllByUserId(UUID.fromString(userId), pageable);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean hasAdminRole = authentication.getAuthorities().stream()
+                .anyMatch(r -> r.getAuthority().equals("ADMIN"));
+
         List<OrderDetailDTO> orders = new ArrayList<>();
-        for (Order order : ordersList) {
-            orders.add(
-                    OrderDetailDTO.builder()
-                            .id(order.getId())
-                            .orderName(order.getOrderName())
-                            .trackCode(order.getTrackCode())
-                            .statusList(statusConverter(order.getOrderStatuses(), language))
-                            .build()
-            );
+        if (hasAdminRole) {
+            Status status = statusRepository.findById(statusId).orElseThrow(() -> new NotFoundException(
+                    String.format("status with id: %s not found", statusId)
+            ));
+            Page<Order> orderList = orderRepository.findAllByStatus(pageable, status);
+            for (Order order : orderList) {
+                orders.add(
+                        OrderDetailDTO.builder()
+                                .id(order.getId())
+                                .orderName(order.getOrderName())
+                                .trackCode(order.getTrackCode())
+                                .statusList(statusConverter(order.getOrderStatuses(), language))
+                                .build()
+                );
+            }
+        } else {
+            Page<Order> ordersList = orderRepository.findAllByUserId(UUID.fromString(userId), pageable);
+            for (Order order : ordersList) {
+                orders.add(
+                        OrderDetailDTO.builder()
+                                .id(order.getId())
+                                .orderName(order.getOrderName())
+                                .trackCode(order.getTrackCode())
+                                .statusList(statusConverter(order.getOrderStatuses(), language))
+                                .build()
+                );
+            }
         }
         return orders;
     }
