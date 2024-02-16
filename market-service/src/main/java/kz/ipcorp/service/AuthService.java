@@ -69,16 +69,10 @@ public class AuthService {
         TokenResponseDTO tokens = new TokenResponseDTO();
         tokens.setAccessToken(access);
 
-//        String domain = request.getHeader("Host");
-
-        String domain = request.getHeader("Access-Control-Allow-Origin") != null ?
-                request.getHeader("Access-Control-Allow-Origin") : "localhost";
-
-        log.info("domain {}", domain);
 
         Cookie cookie = new Cookie("refresh-token", refresh);
         cookie.setPath("/api/auth/seller/access-token");
-        cookie.setDomain(domain);
+        cookie.setDomain("api.ipcorpn.com");
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
         log.info("IN signIn refresh token: {}", cookie.getValue());
