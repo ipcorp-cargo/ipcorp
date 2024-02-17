@@ -207,16 +207,8 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDetailDTO updateStatus(OrderUpdateStatus orderUpdateStatus, String language) {
-        Order order = getByTrackCode(orderUpdateStatus.getTrackCode())
-                .orElseThrow(() -> new NotFoundException(String.format("order with track code %s not found", orderUpdateStatus.getTrackCode())));
-        if(!order.getStatus().getId().toString().equals("3a7b1136-2a5f-41a6-bedf-1f7968b2a781")){
-            throw new NotConfirmedException("incorrect status");
-        }else{
-            Status status = statusService.findById(orderUpdateStatus.getStatusId())
-                    .orElseThrow(() -> new NotFoundException(String.format("status with statusId %s not found", orderUpdateStatus.getStatusId())));
+    public OrderDetailDTO updateStatus(Order order, Status status, String language) {
             createOrderStatus(order, status);
-        }
         Order updatedOrder = orderRepository.saveAndFlush(order);
         return OrderDetailDTO.builder()
                 .id(updatedOrder.getId())
@@ -224,5 +216,31 @@ public class OrderService {
                 .statusList(statusConverter(updatedOrder.getOrderStatuses(), language))
                 .trackCode(updatedOrder.getTrackCode())
                 .build();
+    }
+
+    @Transactional
+    public OrderDetailDTO updateStatusPreLast(String trackCode, String language) {
+        Order order = getByTrackCode(trackCode)
+                .orElseThrow(() -> new NotFoundException(String.format("order with track code %s not found", trackCode)));
+        if(!order.getStatus().getId().toString().equals("3a7b1136-2a5f-41a6-bedf-1f7968b2a781")){
+            throw new NotConfirmedException("incorrect status");
+        }
+
+        Status status = statusService.findById(UUID.fromString("9a2f6db1-cf73-4d7b-bbf5-93632a8f070a"))
+                .orElseThrow(() -> new NotFoundException(String.format("status with statusId %s not found", "9a2f6db1-cf73-4d7b-bbf5-93632a8f070a")));
+        return updateStatus(order, status, language);
+    }
+
+    @Transactional
+    public OrderDetailDTO updateStatusLast(String trackCode, String language) {
+        Order order = getByTrackCode(trackCode)
+                .orElseThrow(() -> new NotFoundException(String.format("order with track code %s not found", trackCode)));
+        if(!order.getStatus().getId().toString().equals("9a2f6db1-cf73-4d7b-bbf5-93632a8f070a")){
+            throw new NotConfirmedException("incorrect status");
+        }
+
+        Status status = statusService.findById(UUID.fromString("1cbd354c-341a-43ac-9136-94d2068896db"))
+                .orElseThrow(() -> new NotFoundException(String.format("status with statusId %s not found", "9a2f6db1-cf73-4d7b-bbf5-93632a8f070a")));
+        return updateStatus(order, status, language);
     }
 }
