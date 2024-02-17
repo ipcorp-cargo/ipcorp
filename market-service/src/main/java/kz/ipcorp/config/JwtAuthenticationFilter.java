@@ -9,6 +9,8 @@ import kz.ipcorp.service.JWTService;
 import kz.ipcorp.service.SellerService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JWTService jwtService;
     private final SellerService sellerService;
+    private final Logger log = LogManager.getLogger(JwtAuthenticationFilter.class);
 
     static {
         System.out.println("JwtAuthenticationFilter");
@@ -33,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+        log.info("IN doFilterInternal");
         String authHeader = request.getHeader("Authorization");
         String token;
 

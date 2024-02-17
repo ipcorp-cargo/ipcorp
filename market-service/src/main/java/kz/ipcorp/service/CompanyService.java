@@ -1,7 +1,10 @@
 package kz.ipcorp.service;
 
+import kz.ipcorp.config.AuthInterceptor;
+import kz.ipcorp.exception.AuthenticationException;
 import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
+import kz.ipcorp.feign.JwtFeignClient;
 import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
 import kz.ipcorp.model.entity.Company;
@@ -19,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,8 @@ import java.util.UUID;
 public class CompanyService {
     private final CompanyRepository companyRepository;
     private final SellerRepository sellerRepository;
+    private final JwtFeignClient jwtFeignClient;
+    private final AuthInterceptor authInterceptor;
     private final Logger log = LogManager.getLogger(CompanyService.class);
 
     @Transactional(readOnly = true)
@@ -96,7 +99,8 @@ public class CompanyService {
     }
 
     @Transactional
-    public void verifyCompany(StatusVerify statusVerify, UUID companyId) {
+    public void verifyCompany(String token, StatusVerify statusVerify, UUID companyId) {
+        checkToken(token);
         Company company = companyRepository.findById(companyId).orElseThrow(
                 () -> new NotFoundException(
                         String.format("company with %s id not found", companyId)
@@ -118,7 +122,8 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public List<CompanyReadDTO> getCompanies(PageRequest of) {
+    public List<CompanyReadDTO> getCompanies(String token, PageRequest of) {
+        checkToken(token);
         List<CompanyReadDTO> companies = new ArrayList<>();
         for (Company company : companyRepository.findAll(of)) {
             companies.add(new CompanyReadDTO(company));
@@ -128,7 +133,9 @@ public class CompanyService {
 
 
     @Transactional(readOnly = true)
-    public List<CompanyReadDTO> getCompaniesByFilter(Status status) {
+    public List<CompanyReadDTO> getCompaniesByFilter(String token, Status status) {
+        log.info("IN getCompaniesByFilter - CompanyService");
+        checkToken(token);
         List<CompanyReadDTO> companies = new ArrayList<>();
         for (Company company : companyRepository.findAllByStatus(status)) {
             companies.add(new CompanyReadDTO(company));
@@ -137,7 +144,8 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public List<CompanyReadDTO> getCompaniesByName(String companyName, PageRequest of) {
+    public List<CompanyReadDTO> getCompaniesByName(String token, String companyName, PageRequest of) {
+        checkToken(token);
         return companyRepository.findByNameContainingIgnoreCase(companyName, of)
                 .stream()
                 .map(CompanyReadDTO::new)
@@ -145,11 +153,24 @@ public class CompanyService {
     }
 
     @Transactional(readOnly = true)
-    public List<CompanyReadDTO> getCompaniesByDate(LocalDate date, PageRequest of) {
+    public List<CompanyReadDTO> getCompaniesByDate(String token, LocalDate date, PageRequest of) {
+        checkToken(token);
         return companyRepository.findByCreatedAt(date, of)
                 .stream()
                 .map(CompanyReadDTO::new)
                 .toList();
+    }
+    private void checkToken(String token){
+        log.info("token: {}", token);
+        authInterceptor.setToken(token);
+        try {
+            String status = jwtFeignClient.testMethod("Bearer " + token);
+            if(!status.equals("status")){
+                log.info("status: " + status);
+            }
+        } catch (Exception e){
+            throw new AuthenticationException("this admin not authorized");
+        }
     }
 }
 
