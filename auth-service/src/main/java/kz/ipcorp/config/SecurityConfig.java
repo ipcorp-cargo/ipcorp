@@ -47,6 +47,7 @@ public class SecurityConfig {
                     request
                             .requestMatchers("/api/auth/info").authenticated()
                             .requestMatchers(HttpMethod.DELETE, "/api/auth").hasAuthority(Role.USER.name())
+                            .requestMatchers(HttpMethod.DELETE, "/api/orders/").hasAuthority(Role.USER.name())
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/api/sms/**").permitAll()
                             .requestMatchers("/api/mail/**").permitAll()
