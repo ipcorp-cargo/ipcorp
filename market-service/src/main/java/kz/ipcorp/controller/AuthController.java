@@ -36,9 +36,9 @@ public class AuthController {
     }
 
     @PostMapping("/access-token")
-    public ResponseEntity<TokenResponseDTO> accessToken(HttpServletRequest request) {
+    public ResponseEntity<TokenResponseDTO> accessToken(@CookieValue(name = "refresh-token") String refreshToken) {
 //        log.info("cookie {}", refreshToken);
-        return ResponseEntity.ok(authService.accessToken(request));
+        return ResponseEntity.ok(authService.accessToken(refreshToken));
     }
 
 
@@ -49,8 +49,8 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<HttpStatus> logout(HttpServletResponse response) {
-        authService.logout(response);
+    public ResponseEntity<HttpStatus> logout() {
+        authService.logout();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

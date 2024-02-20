@@ -72,37 +72,13 @@ public class AuthService {
 
         TokenResponseDTO tokens = new TokenResponseDTO();
         tokens.setAccessToken(access);
-
-
-//        Cookie cookie = new Cookie("refresh-token", refresh);
-//        cookie.setPath("/api/auth/seller/access-token");
-//        cookie.setDomain("api.ipcorpn.com");
-//        cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
-        ResponseCookie cookie = ResponseCookie.from("refresh-token", refresh)
-                .httpOnly(true)
-                .secure(true)
-//                .domain("ipcorpn.com")
-                .path("/api/auth/seller/access-token")
-                .sameSite("None")
-                .build();
-
-        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        log.info("IN signIn refresh token: {}", cookie.getValue());
+        tokens.setRefreshToken(refresh);
         return tokens;
     }
 
     @Transactional(readOnly = true)
-    public TokenResponseDTO accessToken(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, "refresh-token");
+    public TokenResponseDTO accessToken(String refreshToken) {
 
-        log.info("cookie {}", cookie);
-        assert cookie != null;
-        String refreshToken = cookie.getValue();
-        log.info("refreshToken {}", refreshToken);
-        if (refreshToken == null || refreshToken.isEmpty()) {
-            throw new AuthenticationException("refresh-token is not exists");
-        }
 
         UUID sellerId = UUID.fromString(jwtService.extractUsername(refreshToken));
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new NotFoundException("seller is not found"));
@@ -138,14 +114,9 @@ public class AuthService {
         verificationService.invalidateVerificationCode(email);
     }
 
-    public void logout(HttpServletResponse response) {
+    public void logout() {
 
-        Cookie cookie = new Cookie("refresh-token", null);
-        cookie.setPath("/api/auth/seller/access-token");
-        cookie.setDomain("api.ipcorpn.com");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
+
 
     }
 }
