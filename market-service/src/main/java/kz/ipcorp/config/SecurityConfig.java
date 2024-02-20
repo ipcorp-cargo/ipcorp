@@ -1,8 +1,9 @@
 package kz.ipcorp.config;
 
-import feign.Request;
 import kz.ipcorp.service.SellerService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,13 +31,19 @@ SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final SellerService sellerService;
+    private final Logger log = LogManager.getLogger(SecurityConfig.class);
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+        log.info("IN securityFilterChain");
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/open").permitAll()
+                                .requestMatchers("/api/companies/company").permitAll()
+                                .requestMatchers("/api/companies/filter").permitAll()
+                                .requestMatchers("/api/companies/filter/**").permitAll()
+                                .requestMatchers("/api/companies/verify").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                                 .requestMatchers("/api/emails/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()

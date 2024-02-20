@@ -47,10 +47,18 @@ public class OrderController {
 
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @PostMapping("/status")
-    public ResponseEntity<OrderDetailDTO> updateStatusOrderByTrackCode(@RequestBody OrderUpdateStatus orderUpdateStatus,
+    public ResponseEntity<OrderDetailDTO> updateStatusOrderByTrackCodePreLast(@RequestParam("trackCode") String trackCode,
                                                                        @CookieValue(name = "Accept-Language", defaultValue = "ru") String language){
-        log.info("IN updateStatusOrderByTrackCode - orderTrackCode: {}", orderUpdateStatus.getTrackCode());
-        return new ResponseEntity<>(orderService.updateStatus(orderUpdateStatus, language),HttpStatus.OK);
+        log.info("IN updateStatusOrderByTrackCodePreLast - orderTrackCode: {}", trackCode);
+        return new ResponseEntity<>(orderService.updateStatusPreLast(trackCode, language),HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PostMapping("/status/last")
+    public ResponseEntity<OrderDetailDTO> updateStatusOrderByTrackCodeToLast(@RequestParam("trackCode") String trackCode,
+                                                                       @CookieValue(name = "Accept-Language", defaultValue = "ru") String language){
+        log.info("IN updateStatusOrderByTrackCodeLast - orderTrackCode: {}", trackCode);
+        return new ResponseEntity<>(orderService.updateStatusLast(trackCode, language),HttpStatus.OK);
     }
 
 
