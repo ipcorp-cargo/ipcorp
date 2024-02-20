@@ -72,7 +72,18 @@ public class AuthService {
 
         TokenResponseDTO tokens = new TokenResponseDTO();
         tokens.setAccessToken(access);
-        tokens.setRefreshToken(refresh);
+
+        ResponseCookie cookie = ResponseCookie.from("refresh-token", refresh)
+                .domain("ipcorpn.com")
+                .path("/api/auth/seller/access-token")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None")
+
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
         return tokens;
     }
 
