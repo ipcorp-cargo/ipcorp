@@ -82,7 +82,7 @@ public class AuthService {
         ResponseCookie cookie = ResponseCookie.from("refresh-token", refresh)
                 .httpOnly(true)
                 .secure(true)
-                .domain("ipcorpn.com")
+//                .domain("ipcorpn.com")
                 .path("/api/auth/seller/access-token")
                 .sameSite("None")
                 .build();
