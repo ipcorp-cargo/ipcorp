@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.WebUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -121,21 +123,16 @@ public class AuthService {
         Seller seller = sellerRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(String.format("user with email %s not found", email)));
 
-        seller.setPassword(passwordEncoder.encode(newPassword));
         sellerRepository.save(seller);
         verificationService.invalidateVerificationCode(email);
     }
 
     public void logout(HttpServletResponse response, HttpServletRequest request) {
 
-        String domain = request.getHeader("Access-Control-Allow-Origin") != null ?
-                request.getHeader("Access-Control-Allow-Origin") : "localhost";
-
-        log.info("domain {}", domain);
-
         Cookie cookie = new Cookie("refresh-token", null);
         cookie.setPath("/api/auth/seller/access-token");
-        cookie.setDomain(domain);
+        cookie.setDomain("api.ipcorpn.com");
+        cookie.setSecure(true);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
     }
