@@ -20,9 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.WebUtils;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -88,8 +86,15 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public TokenResponseDTO accessToken(String refreshToken) {
+    public TokenResponseDTO accessToken(HttpServletRequest request) {
 
+        Cookie cookie = WebUtils.getCookie(request, "refresh-token");
+        assert cookie != null;
+        String refreshToken = cookie.getValue();
+
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new AuthenticationException("refresh token not found");
+        }
 
         UUID sellerId = UUID.fromString(jwtService.extractUsername(refreshToken));
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new NotFoundException("seller is not found"));
