@@ -74,6 +74,7 @@ public class AuthService {
         cookie.setPath("/api/auth/seller/access-token");
         cookie.setDomain("api.ipcorpn.com");
         cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         response.addCookie(cookie);
         log.info("IN signIn refresh token: {}", cookie.getValue());
         return tokens;
