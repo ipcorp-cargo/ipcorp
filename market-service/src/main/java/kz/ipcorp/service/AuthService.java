@@ -13,6 +13,8 @@ import kz.ipcorp.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,12 +74,20 @@ public class AuthService {
         tokens.setAccessToken(access);
 
 
-        Cookie cookie = new Cookie("refresh-token", refresh);
-        cookie.setPath("/api/auth/seller/access-token");
-        cookie.setDomain("api.ipcorpn.com");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
+//        Cookie cookie = new Cookie("refresh-token", refresh);
+//        cookie.setPath("/api/auth/seller/access-token");
+//        cookie.setDomain("api.ipcorpn.com");
+//        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+        ResponseCookie cookie = ResponseCookie.from("refresh-token", refresh)
+                .httpOnly(true)
+                .secure(true)
+                .domain("api.ipcorpn.com")
+                .path("/api/auth/seller/access-token")
+                .sameSite("Strict")
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         log.info("IN signIn refresh token: {}", cookie.getValue());
         return tokens;
     }
@@ -85,6 +95,7 @@ public class AuthService {
     @Transactional(readOnly = true)
     public TokenResponseDTO accessToken(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, "refresh-token");
+
         log.info("cookie {}", cookie);
         assert cookie != null;
         String refreshToken = cookie.getValue();
@@ -127,13 +138,14 @@ public class AuthService {
         verificationService.invalidateVerificationCode(email);
     }
 
-    public void logout(HttpServletResponse response, HttpServletRequest request) {
+    public void logout(HttpServletResponse response) {
 
         Cookie cookie = new Cookie("refresh-token", null);
         cookie.setPath("/api/auth/seller/access-token");
         cookie.setDomain("api.ipcorpn.com");
-        cookie.setSecure(true);
         cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         response.addCookie(cookie);
+
     }
 }
