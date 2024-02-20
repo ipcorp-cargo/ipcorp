@@ -84,7 +84,7 @@ public class AuthService {
                 .secure(true)
                 .domain("api.ipcorpn.com")
                 .path("/api/auth/seller/access-token")
-                .sameSite("Strict")
+                .sameSite("None")
                 .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
