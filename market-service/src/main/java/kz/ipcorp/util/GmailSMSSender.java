@@ -18,10 +18,19 @@ public class GmailSMSSender {
     public void smsSender(String toGmail, String verificationCode){
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(fromMail);
-        simpleMailMessage.setSubject("confirm your account");
-        simpleMailMessage.setText("короче мына кодты жаз: " + verificationCode);
+        simpleMailMessage.setSubject("验证您的账号");
+        simpleMailMessage.setText(String.format(
+                """
+                尊敬的用户：
+                                
+                您的验证码是：[%s]。请勿将此验证码透露给任何人，包括平台工作人员。如非本人操作，请忽略本短信。
+                                
+                [VENDOR IPCORP]
+                
+                """, verificationCode
+        ));
         simpleMailMessage.setTo(toGmail);
-        log.info("sended code to gmail: {}", toGmail);
+        log.info("send code to gmail: {}", toGmail);
         mailSender.send(simpleMailMessage);
     }
 }
