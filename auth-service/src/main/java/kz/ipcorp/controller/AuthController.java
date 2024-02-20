@@ -1,5 +1,7 @@
 package kz.ipcorp.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kz.ipcorp.model.DTO.SignInRequestDTO;
 import kz.ipcorp.model.DTO.SignUpRequestDTO;
 import kz.ipcorp.model.DTO.TokenResponseDTO;
@@ -39,9 +41,10 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<TokenResponseDTO> signIn(@RequestBody SignInRequestDTO signInRequestDTO) {
+    public ResponseEntity<TokenResponseDTO> signIn(@RequestBody SignInRequestDTO signInRequestDTO,
+                                                   HttpServletResponse response) {
         log.info("IN signIn - phoneNumber: {}, password: ***", signInRequestDTO.getPhoneNumber());
-        return ResponseEntity.ok(authenticationService.signIn(signInRequestDTO));
+        return ResponseEntity.ok(authenticationService.signIn(signInRequestDTO, response));
     }
 
 

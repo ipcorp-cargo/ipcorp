@@ -1,5 +1,6 @@
 package kz.ipcorp.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import kz.ipcorp.exception.*;
 import kz.ipcorp.model.DTO.SignInRequestDTO;
 import kz.ipcorp.model.DTO.SignUpRequestDTO;
@@ -11,6 +12,8 @@ import kz.ipcorp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +67,7 @@ public class AuthenticationService {
         verificationService.invalidateVerificationCode(signUpRequestDTO.getPhoneNumber());
     }
 
-    public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO) {
+    public TokenResponseDTO signIn(SignInRequestDTO signInRequestDTO, HttpServletResponse response) {
         User user = userRepository.findByPhoneNumber(signInRequestDTO.getPhoneNumber())
                 .orElseThrow(() -> new NotFoundException(
                         String.format("user with phoneNumber %s not found", signInRequestDTO.getPhoneNumber())));
@@ -77,6 +80,19 @@ public class AuthenticationService {
         TokenResponseDTO tokens = new TokenResponseDTO();
         tokens.setAccessToken(access);
         tokens.setRefreshToken(refresh);
+
+
+        ResponseCookie cookie = ResponseCookie.from("refresh-token", refresh)
+                .path("/api/auth/access-token")
+                .secure(true)
+                .httpOnly(true)
+                .sameSite("None")
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+
+
         log.info("IN signIn - phoneNumber: {}", signInRequestDTO.getPhoneNumber());
         return tokens;
     }

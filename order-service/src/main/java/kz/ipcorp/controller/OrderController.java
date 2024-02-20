@@ -1,5 +1,6 @@
 package kz.ipcorp.controller;
 
+import jakarta.ws.rs.Path;
 import kz.ipcorp.model.DTO.OrderUpdateStatus;
 import kz.ipcorp.model.DTO.OrderCreateDTO;
 import kz.ipcorp.model.DTO.OrderDetailDTO;
@@ -67,5 +68,12 @@ public class OrderController {
                                                    @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
         log.info("IN getOrder - trackCode: {}, language: {}", trackCode, language);
         return ResponseEntity.ok(orderService.getOrder(trackCode, language));
+    }
+
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity<HttpStatus> deleteOrder(@PathVariable("orderId") UUID orderId,
+                                                  Principal principal) {
+        orderService.deleteOrder(orderId, UUID.fromString(principal.getName()));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
