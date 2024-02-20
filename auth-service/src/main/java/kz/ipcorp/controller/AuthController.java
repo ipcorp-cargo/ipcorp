@@ -59,7 +59,6 @@ public class AuthController {
     }
 
     @DeleteMapping()
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<HttpStatus> deleteUser(Principal principal) {
         log.info("delete with id {}", UUID.fromString(principal.getName()));
         authenticationService.deleteUser(UUID.fromString(principal.getName()));

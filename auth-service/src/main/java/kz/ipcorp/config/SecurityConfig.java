@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -45,6 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request
                             .requestMatchers("/api/auth/info").authenticated()
+                            .requestMatchers(HttpMethod.DELETE, "/api/auth").hasAuthority(Role.USER.name())
                             .requestMatchers("/api/auth/**").permitAll()
                             .requestMatchers("/api/sms/**").permitAll()
                             .requestMatchers("/api/mail/**").permitAll()
