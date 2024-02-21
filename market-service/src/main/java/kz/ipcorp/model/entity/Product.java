@@ -2,6 +2,7 @@ package kz.ipcorp.model.entity;
 
 
 import jakarta.persistence.*;
+import kz.ipcorp.exception.NotConfirmedException;
 import lombok.Data;
 import lombok.ToString;
 
@@ -40,4 +41,10 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    public void deleteImagePath(UUID sellerId, String imagePath) {
+        if (!company.getSeller().getId().equals(sellerId)) {
+            throw new NotConfirmedException("no access for delete image");
+        }
+        this.imagePaths.removeIf(path -> path.equals(imagePath));
+    }
 }

@@ -54,12 +54,21 @@ public class ProductController {
     }
 
     @PostMapping(path = "/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> saveImage(@PathVariable("productId") UUID productId,
+    public ResponseEntity<HttpStatus> saveImage(@PathVariable("productId") UUID productId,
                                        @RequestParam("image") MultipartFile image){
         String path = mediaFeignClient.getPath(image);
         productService.saveImagePath(productId, path);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("/{productId}/image")
+    public ResponseEntity<HttpStatus> deleteImage(Principal principal,
+                                                  @PathVariable("productId") UUID productId,
+                                                  @RequestParam("imagePath") String path) {
+        productService.deleteImageProduct(UUID.fromString(principal.getName()), productId, path);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 
     @GetMapping("/filter")
     public ResponseEntity<List<ProductViewDTO>> getProductsByCategory(
@@ -71,7 +80,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductsByCategory(categoryId, language, PageRequest.of(page, size)));
     }
     @DeleteMapping("/{productId}")
-    public ResponseEntity<HttpStatus> deleteOrder(@PathVariable("productId") UUID productId,
+    public ResponseEntity<HttpStatus> deleteProduct(@PathVariable("productId") UUID productId,
                                                   Principal principal) {
         productService.deleteProduct(UUID.fromString(principal.getName()), null, productId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);

@@ -163,4 +163,12 @@ public class ProductService {
         return new ProductViewDTO(product, language);
     }
 
+    @Transactional
+    public void deleteImageProduct(UUID sellerId, UUID productId, String path) {
+//        TODO:
+        Product product = productRepository.findById(productId).orElseThrow(() ->
+                new NotFoundException("product not found"));
+        product.deleteImagePath(sellerId, path);
+//        TODO: delete image data from media service
+    }
 }
