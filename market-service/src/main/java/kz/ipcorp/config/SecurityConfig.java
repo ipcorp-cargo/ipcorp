@@ -40,7 +40,7 @@ SecurityConfig {
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/open").permitAll()
-                                .requestMatchers("/api/companies/company").permitAll()
+                                .requestMatchers(HttpMethod.GET,"/api/companies").permitAll()
                                 .requestMatchers("/api/companies/filter").permitAll()
                                 .requestMatchers("/api/companies/filter/**").permitAll()
                                 .requestMatchers("/api/companies/verify").permitAll()
