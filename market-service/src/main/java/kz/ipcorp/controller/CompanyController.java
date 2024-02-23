@@ -3,6 +3,7 @@ package kz.ipcorp.controller;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.servlet.http.HttpServletRequest;
 import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.CompanyCreateDTO;
 import kz.ipcorp.model.DTO.CompanyReadDTO;
@@ -34,7 +35,7 @@ public class CompanyController {
     private final Logger log = LogManager.getLogger(CompanyController.class);
 
 
-    @GetMapping("/company")
+    @GetMapping
     public ResponseEntity<List<CompanyReadDTO>> getCompanies(@RequestParam(name = "Authorization") String token,
                                                              @RequestParam(value = "page", defaultValue = "0") int page,
                                                              @RequestParam(value = "size", defaultValue = "10") int size) {
@@ -43,31 +44,40 @@ public class CompanyController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByFilter(@RequestParam(name = "Authorization") String token,
-                                                                     @Parameter(in = ParameterIn.QUERY, name = "status",
-            description = "Status filter",
-            schema = @Schema(type = "string", allowableValues = {"NOT_UPLOADED", "UPLOADED", "ACCEPT", "DENY"}))
-                                                                     @RequestParam("status") Status status) {
-        log.info("IN getCompaniesByFilter");
-        return new ResponseEntity<>(companyService.getCompaniesByFilter(token,status), HttpStatus.OK);
+    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByFilter(@RequestParam(value = "status", required = false) Status status,
+                                                                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                                     @RequestParam(value = "companyName", required = false) String companyName,
+                                                                     @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                     @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                     @RequestParam(name = "Authorization") String token) {
+        return ResponseEntity.ok(companyService.getCompaniesByFilter(status, date, companyName, PageRequest.of(page, size), token));
     }
-
-    @GetMapping("/filter/date")
-    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByDate(@RequestParam(name = "Authorization") String token,
-                                                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                                                   @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                   @RequestParam(value = "size", defaultValue = "10") int size) {
-        log.info("IN getCompaniesByDate");
-        return new ResponseEntity<>(companyService.getCompaniesByDate(token, date, PageRequest.of(page, size)), HttpStatus.OK);
-    }
-    @GetMapping("/filter/name")
-    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByName(@RequestParam(name = "Authorization") String token,
-                                                                   @RequestParam("companyName") String companyName,
-                                                                   @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                   @RequestParam(value = "size", defaultValue = "10") int size) {
-        log.info("IN getCompaniesByName");
-        return new ResponseEntity<>(companyService.getCompaniesByName(token,companyName, PageRequest.of(page, size)), HttpStatus.OK);
-    }
+//    @GetMapping("/filter") // -- filter by status
+//    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByFilter(@RequestParam(name = "Authorization") String token,
+//                                                                     @Parameter(in = ParameterIn.QUERY, name = "status",
+//            description = "Status filter",
+//            schema = @Schema(type = "string", allowableValues = {"NOT_UPLOADED", "UPLOADED", "ACCEPT", "DENY"}))
+//                                                                     @RequestParam("status") Status status) {
+//        log.info("IN getCompaniesByFilter");
+//        return new ResponseEntity<>(companyService.getCompaniesByFilter(token,status), HttpStatus.OK);
+//    }
+//
+//    @GetMapping("/filter/date") // -- filter by date
+//    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByDate(@RequestParam(name = "Authorization") String token,
+//                                                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+//                                                                   @RequestParam(value = "page", defaultValue = "0") int page,
+//                                                                   @RequestParam(value = "size", defaultValue = "10") int size) {
+//        log.info("IN getCompaniesByDate");
+//        return new ResponseEntity<>(companyService.getCompaniesByDate(token, date, PageRequest.of(page, size)), HttpStatus.OK);
+//    }
+//    @GetMapping("/filter/name") // -- filter by name
+//    public ResponseEntity<List<CompanyReadDTO>> getCompaniesByName(@RequestParam(name = "Authorization") String token,
+//                                                                   @RequestParam("companyName") String companyName,
+//                                                                   @RequestParam(value = "page", defaultValue = "0") int page,
+//                                                                   @RequestParam(value = "size", defaultValue = "10") int size) {
+//        log.info("IN getCompaniesByName");
+//        return new ResponseEntity<>(companyService.getCompaniesByName(token,companyName, PageRequest.of(page, size)), HttpStatus.OK);
+//    }
 
     @GetMapping("/seller")
     public ResponseEntity<CompanyReadDTO> getCompany(Principal principal) {

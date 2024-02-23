@@ -19,7 +19,7 @@ public interface CompanyRepository extends JpaRepository<Company, UUID> {
     List<Company> findByNameContainingIgnoreCase(String companyName, PageRequest of);
     List<Company> findByCreatedAt(LocalDate date, PageRequest of);
 
-    List<Company> findAllByStatus(Status status);
+    List<Company> findAllByStatus(Status status, PageRequest of);
     @Modifying
     @Query("UPDATE Company c SET c.pathToBusinessLicense = :pathToBusinessLicense, c.status = :status WHERE c.id = :companyId")
     void savePathToBusinessLicense(UUID companyId, String pathToBusinessLicense, Status status);

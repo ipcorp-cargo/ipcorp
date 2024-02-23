@@ -1,5 +1,6 @@
 package kz.ipcorp.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import kz.ipcorp.config.AuthInterceptor;
 import kz.ipcorp.exception.AuthenticationException;
 import kz.ipcorp.exception.NotConfirmedException;
@@ -133,14 +134,13 @@ public class CompanyService {
 
 
     @Transactional(readOnly = true)
-    public List<CompanyReadDTO> getCompaniesByFilter(String token, Status status) {
+    public List<CompanyReadDTO> getCompaniesByStatus(String token, Status status, PageRequest pageRequest) {
         log.info("IN getCompaniesByFilter - CompanyService");
         checkToken(token);
-        List<CompanyReadDTO> companies = new ArrayList<>();
-        for (Company company : companyRepository.findAllByStatus(status)) {
-            companies.add(new CompanyReadDTO(company));
-        }
-        return companies;
+        return companyRepository.findAllByStatus(status, pageRequest)
+                .stream()
+                .map(CompanyReadDTO::new)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -170,6 +170,20 @@ public class CompanyService {
             }
         } catch (Exception e){
             throw new AuthenticationException("this admin not authorized");
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<CompanyReadDTO> getCompaniesByFilter(Status status, LocalDate date, String companyName,  PageRequest pageRequest, String token) {
+        log.info("IN getCompaniesByFilter token: {}", token);
+        if (status != null) {
+            return getCompaniesByStatus(token, status, pageRequest);
+        } else if(date != null) {
+            return getCompaniesByDate(token, date,pageRequest);
+        } else if(companyName != null) {
+            return getCompaniesByName(token, companyName, pageRequest);
+        } else {
+            return null;
         }
     }
 }
