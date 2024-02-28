@@ -171,4 +171,10 @@ public class ProductService {
         product.deleteImagePath(sellerId, path);
 //        TODO: delete image data from media service
     }
+
+    @Transactional(readOnly = true)
+    public List<ProductViewDTO> getProductByName(String productName, PageRequest pageRequest, String language) {
+        Page<Product> productPage = productRepository.findByNameContainsIgnoreCase(productName, pageRequest);
+        return productPage.map((product -> new ProductViewDTO(product, language))).getContent();
+    }
 }

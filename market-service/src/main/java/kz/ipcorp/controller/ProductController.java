@@ -4,6 +4,7 @@ import kz.ipcorp.feign.MediaFeignClient;
 import kz.ipcorp.model.DTO.ProductSaveDTO;
 import kz.ipcorp.model.DTO.ProductViewDTO;
 import kz.ipcorp.service.ProductService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -67,6 +68,14 @@ public class ProductController {
                                                   @RequestParam("imagePath") String path) {
         productService.deleteImageProduct(UUID.fromString(principal.getName()), productId, path);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductViewDTO>> getProductByName(@RequestParam("productName") String productName,
+                                                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                 @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                 @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
+        return ResponseEntity.ok(productService.getProductByName(productName,  PageRequest.of(page, size), language));
     }
 
 

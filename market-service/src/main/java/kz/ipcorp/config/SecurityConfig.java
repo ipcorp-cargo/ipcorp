@@ -44,6 +44,7 @@ SecurityConfig {
                                 .requestMatchers("/api/companies/filter").permitAll()
                                 .requestMatchers("/api/companies/filter/**").permitAll()
                                 .requestMatchers("/api/companies/verify").permitAll()
+                                .requestMatchers("/api/products/search").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                                 .requestMatchers("/api/emails/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()

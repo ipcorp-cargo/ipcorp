@@ -26,6 +26,7 @@ public class ValidatorRouter {
             "/api/emails/verify",
             "/api/sms",
             "/api/sms/verify",
+            "/api/products/search",
             "/api/companies/company",
             "/api/companies/filter",
             "/api/companies/filter/date",
