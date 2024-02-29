@@ -3,6 +3,7 @@ package kz.ipcorp.model.entity;
 import jakarta.persistence.*;
 import kz.ipcorp.model.enumuration.Role;
 import lombok.Data;
+import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,6 +42,11 @@ public class User implements UserDetails {
 
     @Column(name = "created_at")
     private LocalDate createdAt = LocalDate.now();
+
+    @ElementCollection
+    @CollectionTable(name = "favorite_products", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "product_id")
+    private List<UUID> favoriteProducts = new ArrayList<>();
     public User() {
 
     }

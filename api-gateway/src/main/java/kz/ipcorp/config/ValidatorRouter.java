@@ -31,7 +31,8 @@ public class ValidatorRouter {
             "/api/companies/filter",
             "/api/companies/filter/date",
             "/api/companies/filter/name",
-            "/api/companies/verify"
+            "/api/companies/verify",
+            "/api/products/user/favorite"
     );
 
 

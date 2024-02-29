@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -176,5 +177,14 @@ public class ProductService {
     public List<ProductViewDTO> getProductByName(String productName, PageRequest pageRequest, String language) {
         Page<Product> productPage = productRepository.findByNameContainsIgnoreCase(productName, pageRequest);
         return productPage.map((product -> new ProductViewDTO(product, language))).getContent();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductViewDTO> getFavoriteProducts(List<UUID> productIds, String language) {
+        List<ProductViewDTO> productViewDTOS = new ArrayList<>();
+        for (Product product : productRepository.findAllById(productIds)) {
+            productViewDTOS.add(new ProductViewDTO(product, language));
+        }
+        return productViewDTOS;
     }
 }

@@ -1,6 +1,7 @@
 package kz.ipcorp.controller;
 
 import kz.ipcorp.feign.MediaFeignClient;
+import kz.ipcorp.model.DTO.ProductIdsWrapper;
 import kz.ipcorp.model.DTO.ProductSaveDTO;
 import kz.ipcorp.model.DTO.ProductViewDTO;
 import kz.ipcorp.service.ProductService;
@@ -38,7 +39,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductViewDTO>> getProducts(@CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
+    public ResponseEntity<List<ProductViewDTO>> getProducts(
+            @CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
                                      @RequestParam(value = "page", defaultValue = "0") int page,
                                      @RequestParam(value = "size", defaultValue = "10") int size,
                                      Principal principal) {
@@ -53,6 +55,14 @@ public class ProductController {
             @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
         return ResponseEntity.ok(productService.getProduct(productId, language));
     }
+
+    @GetMapping("/user/favorite")
+    public ResponseEntity<List<ProductViewDTO>> getFavoriteProducts(@RequestParam("language") String language,
+                                                                    @RequestParam("productIds") List<UUID> productIds) {
+        log.info("{}, {}",language, productIds);
+        return ResponseEntity.ok(productService.getFavoriteProducts(productIds, language));
+    }
+
 
     @PostMapping(path = "/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<HttpStatus> saveImage(@PathVariable("productId") UUID productId,

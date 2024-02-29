@@ -33,6 +33,11 @@ CREATE TABLE IF NOT EXISTS users(
     branch_id    uuid REFERENCES branches (id)
 );
 
+CREATE TABLE IF NOT EXISTS favorite_products(
+    user_id uuid NOT NULL,
+    product_id uuid DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
 CREATE TABLE IF NOT EXISTS user_statuses
 (
