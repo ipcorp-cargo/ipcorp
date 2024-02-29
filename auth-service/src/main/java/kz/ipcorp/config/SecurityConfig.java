@@ -59,6 +59,8 @@ public class SecurityConfig {
                             .requestMatchers("/api/branches/").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
                             .requestMatchers("/api/admin").hasAnyAuthority(Role.ADMIN.name())
                             .requestMatchers("/api/user").hasAnyAuthority(Role.USER.name())
+                            .requestMatchers(HttpMethod.POST, "/api/products/favorite/").hasAnyAuthority(Role.USER.name())
+                            .requestMatchers(HttpMethod.GET, "/api/products/favorite").hasAnyAuthority(Role.USER.name())
                             .anyRequest().permitAll();
                 })
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
