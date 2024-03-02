@@ -27,4 +27,10 @@ public class ProductController {
     public ResponseEntity<List<ProductViewDTO>> getFavoriteProduct(Principal principal,@CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
         return userService.getFavoriteProducts(UUID.fromString(principal.getName()), language);
     }
+
+    @DeleteMapping("/{product_id}")
+    public ResponseEntity<HttpStatus> deleteFavoriteProduct(Principal principal, @PathVariable("product_id") UUID productId) {
+        userService.deleteFavoriteProduct(UUID.fromString(principal.getName()), productId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

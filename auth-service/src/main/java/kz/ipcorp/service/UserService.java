@@ -57,4 +57,11 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
         return userFeignClient.getFavoriteProducts(language, user.getFavoriteProducts());
     }
+
+    @Transactional
+    public void deleteFavoriteProduct(UUID userId, UUID productId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
+        user.removeFavoriteProduct(productId);
+        userRepository.saveAndFlush(user);
+    }
 }
