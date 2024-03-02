@@ -17,6 +17,7 @@ import java.util.UUID;
 public class ProductController {
 
     private final UserService userService;
+
     @PostMapping("/{product_id}")
     public ResponseEntity<HttpStatus> addFavoriteProduct(Principal principal, @PathVariable("product_id") UUID product_id) {
         userService.addFavoriteProduct(UUID.fromString(principal.getName()), product_id);
@@ -24,7 +25,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductViewDTO>> getFavoriteProduct(Principal principal,@CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
+    public ResponseEntity<List<ProductViewDTO>> getFavoriteProduct(Principal principal, @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
         return userService.getFavoriteProducts(UUID.fromString(principal.getName()), language);
     }
 
@@ -32,5 +33,11 @@ public class ProductController {
     public ResponseEntity<HttpStatus> deleteFavoriteProduct(Principal principal, @PathVariable("product_id") UUID productId) {
         userService.deleteFavoriteProduct(UUID.fromString(principal.getName()), productId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{product_id}")
+    public ResponseEntity<Boolean> isFavoriteProduct(Principal principal,
+                                                     @PathVariable("product_id") UUID productId) {
+        return ResponseEntity.ok(userService.isFavoriteProduct(UUID.fromString(principal.getName()), productId));
     }
 }

@@ -10,6 +10,7 @@ package kz.ipcorp.service;
 
 import kz.ipcorp.exception.NotConfirmedException;
 import kz.ipcorp.exception.NotFoundException;
+import kz.ipcorp.feign.JwtFeignClient;
 import kz.ipcorp.model.DTO.ProductSaveDTO;
 import kz.ipcorp.model.DTO.ProductViewDTO;
 import kz.ipcorp.model.entity.Category;
@@ -24,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -187,4 +190,5 @@ public class ProductService {
         }
         return productViewDTOS;
     }
+
 }

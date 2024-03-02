@@ -84,4 +84,7 @@ public class User implements UserDetails {
     public void removeFavoriteProduct(UUID productId) {
         favoriteProducts.remove(productId);
     }
+    public boolean isFavoriteProduct(UUID productId) {
+        return favoriteProducts.contains(productId);
+    }
 }

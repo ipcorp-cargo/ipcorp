@@ -64,4 +64,9 @@ public class UserService {
         user.removeFavoriteProduct(productId);
         userRepository.saveAndFlush(user);
     }
+
+    public Boolean isFavoriteProduct(UUID userId, UUID productId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found"));
+        return user.isFavoriteProduct(productId);
+    }
 }

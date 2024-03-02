@@ -8,4 +8,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface JwtFeignClient {
     @GetMapping(path = "api/admin")
     String testMethod(@RequestHeader("Authorization") String token);
+
+
+
 }

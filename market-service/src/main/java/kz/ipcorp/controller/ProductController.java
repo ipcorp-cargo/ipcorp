@@ -31,42 +31,45 @@ public class ProductController {
     private final ProductService productService;
     private final MediaFeignClient mediaFeignClient;
     private final Logger log = LogManager.getLogger(ProductController.class);
+
     @PostMapping
     public ResponseEntity<UUID> saveProduct(@RequestBody ProductSaveDTO productSaveDTO, Principal principal) {
         log.info("IN saveProduct - productName: {}, sellerId: {}", productSaveDTO.getName(), UUID.fromString(principal.getName()));
         UUID productId = productService.saveProduct(productSaveDTO, UUID.fromString(principal.getName()));
-        return new ResponseEntity<>(productId,HttpStatus.CREATED);
+        return new ResponseEntity<>(productId, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<ProductViewDTO>> getProducts(
             @CookieValue(name = "Accept-Language", defaultValue = "ru") String language,
-                                     @RequestParam(value = "page", defaultValue = "0") int page,
-                                     @RequestParam(value = "size", defaultValue = "10") int size,
-                                     Principal principal) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            Principal principal) {
         if (principal != null) {
             return new ResponseEntity<>(productService.getProducts(UUID.fromString(principal.getName()), language, PageRequest.of(page, size)), HttpStatus.OK);
         }
         return new ResponseEntity<>(productService.getAllProducts(language, PageRequest.of(page, size)), HttpStatus.OK);
     }
 
+
+
     @GetMapping("/{productId}")
     public ResponseEntity<ProductViewDTO> getProduct(@PathVariable("productId") UUID productId,
-            @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
+                                                     @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
         return ResponseEntity.ok(productService.getProduct(productId, language));
     }
 
     @GetMapping("/user/favorite")
     public ResponseEntity<List<ProductViewDTO>> getFavoriteProducts(@RequestParam("language") String language,
                                                                     @RequestParam("productIds") List<UUID> productIds) {
-        log.info("{}, {}",language, productIds);
+        log.info("{}, {}", language, productIds);
         return ResponseEntity.ok(productService.getFavoriteProducts(productIds, language));
     }
 
 
     @PostMapping(path = "/{productId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<HttpStatus> saveImage(@PathVariable("productId") UUID productId,
-                                       @RequestParam("image") MultipartFile image){
+                                                @RequestParam("image") MultipartFile image) {
         String path = mediaFeignClient.getPath(image);
         productService.saveImagePath(productId, path);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -85,7 +88,7 @@ public class ProductController {
                                                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                                                  @RequestParam(value = "size", defaultValue = "10") int size,
                                                                  @CookieValue(name = "Accept-Language", defaultValue = "ru") String language) {
-        return ResponseEntity.ok(productService.getProductByName(productName,  PageRequest.of(page, size), language));
+        return ResponseEntity.ok(productService.getProductByName(productName, PageRequest.of(page, size), language));
     }
 
 
@@ -98,9 +101,10 @@ public class ProductController {
     ) {
         return ResponseEntity.ok(productService.getProductsByCategory(categoryId, language, PageRequest.of(page, size)));
     }
+
     @DeleteMapping("/{productId}")
     public ResponseEntity<HttpStatus> deleteProduct(@PathVariable("productId") UUID productId,
-                                                  Principal principal) {
+                                                    Principal principal) {
         productService.deleteProduct(UUID.fromString(principal.getName()), null, productId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }

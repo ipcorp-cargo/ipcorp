@@ -20,6 +20,7 @@ public class ProductViewDTO {
     private List<String> imagePaths = new ArrayList<>();
     private String categoryName;
     private String companyName;
+    private boolean isFavorite;
 
     public ProductViewDTO() {}
 
